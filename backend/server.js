@@ -11,16 +11,13 @@ const app = express();
 dotenv.config();
 const PORT = process.env.PORT || 4000;
 
-// ✅ Connect to DB
 connectDB();
 
-// ✅ Middlewares
 app.use(express.json());
-app.use(cors()); // temporary for local
+app.use(cors());
 
 app.use(express.urlencoded({ extended: true }));
 
-// ✅ CORS setup (Correct key: credentials with small "c")
 app.use(
   cors({
     origin: ["http://localhost:3000", "http://localhost"],
@@ -28,10 +25,8 @@ app.use(
   })
 );
 
-// ✅ Serve static files (like uploaded images)
 app.use("/uploads", express.static(path.join(path.resolve(), "uploads")));
 
-// ✅ Multer storage config
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "uploads/");
@@ -41,14 +36,11 @@ const storage = multer.diskStorage({
   },
 });
 
-// ✅ Create upload instance
 export const upload = multer({ storage });
 
-// ✅ Routes
-app.use("/api/country", countryRoutes); // This will handle form submission
+app.use("/api/country", countryRoutes);
 app.use("/api/", commonRoutes);
 
-// ✅ Start Server
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
