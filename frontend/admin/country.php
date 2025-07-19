@@ -76,6 +76,7 @@
             <tbody id="countryTable" style="font-size: 0.95rem;"></tbody>
           </table>
         </div>
+        <h1>Hello</h1>
       </div>
       <?php include '../components/footer.php'; ?>
     </div>
