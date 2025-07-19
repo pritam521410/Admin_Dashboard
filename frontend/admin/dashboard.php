@@ -13,13 +13,13 @@
   <body>
     <?php include '../components/header.php'; ?>
     <?php include '../components/sidebar.php'; ?>
-    <div class="main">
+    <div class="main page-transition">
       <?php include '../components/page-header.php'; ?>
       <div class="dashboard-cards">
-        <a href="country.html" style="text-decoration: none">
+        <a href="country.php" style="text-decoration: none">
           <div class="card card-blue">
             <div class="card-title" style="color: inherit">Country</div>
-            <div class="card-value">248</div>
+            <div class="card-value" id='countryCountForDashboard'></div>
             <span class="more-info"
               >More info <i class="fa fa-arrow-circle-right"></i
             ></span>

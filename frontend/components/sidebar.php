@@ -10,7 +10,7 @@
   <nav>
     <ul>
       <li>
-        <a href="#" class="active"
+        <a href="dashboard.php" class="active"
           ><i class="fa fa-th-large"></i
           ><span class="menu-label">Dashboard</span
           ><span class="badge">New</span></a
@@ -34,6 +34,7 @@
           <li>
             <a
               href="country.php"
+              onclick="keepSubmenuOpen('locationDirectoryDropdown', 'locationChevron')"
               style="
                 color: inherit;
                 text-decoration: none;
@@ -45,6 +46,7 @@
           <li>
             <a
               href="state.html"
+              onclick="keepSubmenuOpen('locationDirectoryDropdown', 'locationChevron')"
               style="
                 color: inherit;
                 text-decoration: none;
@@ -56,6 +58,7 @@
           <li>
             <a
               href="district.html"
+              onclick="keepSubmenuOpen('locationDirectoryDropdown', 'locationChevron')"
               style="
                 color: inherit;
                 text-decoration: none;

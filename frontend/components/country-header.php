@@ -2,7 +2,7 @@
 <div class="main-header">
   <h1>
     <a
-      href="dashboard.php"
+      href="admin/dashboard.php"
       style="color: inherit; text-decoration: none"
     >
       <i class="fa fa-globe"></i>

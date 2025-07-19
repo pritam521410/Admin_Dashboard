@@ -111,5 +111,16 @@ function renderTable() {
 // Initialize country page when DOM is loaded
 document.addEventListener("DOMContentLoaded", function () {
   console.log("Country management initialized successfully");
+
+  // Auto-open Location Directory submenu on country page
+  const locationDropdown = document.getElementById("locationDirectoryDropdown");
+  const locationChevron = document.getElementById("locationChevron");
+  if (locationDropdown && !locationDropdown.classList.contains("open")) {
+    locationDropdown.classList.add("open");
+    if (locationChevron) {
+      locationChevron.style.transform = "rotate(180deg)";
+    }
+  }
+
   fetchCountries();
 });

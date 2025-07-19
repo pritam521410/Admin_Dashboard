@@ -10,8 +10,8 @@
 <body>
   <?php include '../components/header.php'; ?>
   <?php include '../components/sidebar.php'; ?>
-  <div class="main">
-    <?php include '../components/country-header.php'; ?>
+      <div class="main page-transition">
+      <?php include '../components/country-header.php'; ?>
     <!-- Country management content (form/list) -->
     <div class="main-container" style="max-width: 900px; margin: 0 auto;">
       <div class="top-btns" style="display: flex; gap: 12px; margin-bottom: 24px;">
