@@ -43,13 +43,10 @@ document.addEventListener("DOMContentLoaded", function () {
       console.log("Country form submitted");
       const formData = new FormData(countryForm);
       try {
-        const response = await fetch(
-          "http://localhost:4000/api/country/add-country",
-          {
-            method: "POST",
-            body: formData,
-          }
-        );
+        const response = await fetch(`${baseUrl}/country/add-country`, {
+          method: "POST",
+          body: formData,
+        });
         const result = await response.json();
         alert(result.message || "Country added!");
         countryForm.reset();

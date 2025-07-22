@@ -83,14 +83,23 @@ document.addEventListener("DOMContentLoaded", function () {
   async function countForDashboard() {
     try {
       const res = await fetch(`${baseUrl}/get-counts`);
+
       const data = await res.json();
+      console.log(data.data.countryCount, data.data.stateCount);
+
       const countryCountForDashboard = document.getElementById(
         "countryCountForDashboard"
       );
 
+      const StateCountForDashboard = document.getElementById(
+        "StateCountForDashboard"
+      );
       // console.log(data.data.country);
       if (countryCountForDashboard) {
-        countryCountForDashboard.textContent = data.data.country;
+        countryCountForDashboard.textContent = data.data.countryCount;
+      }
+      if (StateCountForDashboard) {
+        StateCountForDashboard.textContent = data.data.stateCount;
       }
     } catch (err) {
       console.error("Fetch error:", err);
@@ -99,6 +108,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Close sidebar on nav click (mobile only)
 
   countForDashboard();
+
   document.addEventListener("DOMContentLoaded", function () {
     // Handle main menu items (not submenu items)
     document.querySelectorAll(".sidebar nav > ul > li").forEach((el) => {
@@ -179,13 +189,14 @@ document.addEventListener("DOMContentLoaded", function () {
     // Add any additional initialization code here
     // For example, loading dashboard data, setting up event listeners, etc.
   });
+
+  window.toggleLocationDirectory = toggleLocationDirectory;
+  window.toggleMasterData = toggleMasterData;
+  window.toggleCollegeMaster = toggleCollegeMaster;
+  window.toggleExamMaster = toggleExamMaster;
+  window.toggleAdvMaster = toggleAdvMaster;
+  window.toggleEnquiryData = toggleEnquiryData;
+  window.toggleExtraPages = toggleExtraPages;
 });
 
 // Expose sidebar toggle functions globally for sidebar.php onclicks
-window.toggleLocationDirectory = toggleLocationDirectory;
-window.toggleMasterData = toggleMasterData;
-window.toggleCollegeMaster = toggleCollegeMaster;
-window.toggleExamMaster = toggleExamMaster;
-window.toggleAdvMaster = toggleAdvMaster;
-window.toggleEnquiryData = toggleEnquiryData;
-window.toggleExtraPages = toggleExtraPages;

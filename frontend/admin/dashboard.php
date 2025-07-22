@@ -23,10 +23,10 @@
             <span class="more-info">More info <i class="fa fa-arrow-circle-right"></i></span>
           </div>
         </a>
-        <a href="state.php" style="text-decoration: none">
+        <a href="state.php"  style="text-decoration: none" >
           <div class="card card-orange">
             <div class="card-title">State</div>
-            <div class="card-value">4140</div>
+            <div class="card-value" id='StateCountForDashboard'>0</div>
             <span class="more-info">More info <i class="fa fa-arrow-circle-right"></i></span>
           </div>
         </a>
