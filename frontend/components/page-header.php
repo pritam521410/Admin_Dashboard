@@ -10,4 +10,4 @@
     Admin Dashboard
   </h1>
   <div class="breadcrumb">Home / Dashboard</div>
-</div> 
+</div>

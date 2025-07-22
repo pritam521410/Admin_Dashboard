@@ -76,11 +76,12 @@
             <tbody id="countryTable" style="font-size: 0.95rem;"></tbody>
           </table>
         </div>
+    
       </div>
       <?php include '../components/footer.php'; ?>
     </div>
+    <script src="../js/script.js"></script>
     <script src="../js/dashboard.js"></script>
     <script src="../js/country.js"></script>
   </body>
-</html>
 </html>

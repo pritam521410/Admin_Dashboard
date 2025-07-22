@@ -45,7 +45,7 @@
           </li>
           <li>
             <a
-              href="state.html"
+              href="state.php"
               onclick="keepSubmenuOpen('locationDirectoryDropdown', 'locationChevron')"
               style="
                 color: inherit;
@@ -437,4 +437,4 @@
     </ul>
   </nav>
   <a href="#" class="logout"><i class="fa fa-sign-out-alt"></i>Logout</a>
-</div> 
+</div>

@@ -6,6 +6,7 @@ import path from "path";
 import { connectDB } from "./db.js";
 import countryRoutes from "./Route/country.routes.js";
 import commonRoutes from "./Route/common.routes.js";
+import stateRoutes from "./Route/state.routes.js";
 
 const app = express();
 dotenv.config();
@@ -40,6 +41,7 @@ export const upload = multer({ storage });
 
 app.use("/api/country", countryRoutes);
 app.use("/api/", commonRoutes);
+app.use("/api/state", stateRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
