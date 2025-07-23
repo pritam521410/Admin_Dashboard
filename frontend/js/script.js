@@ -20,13 +20,11 @@ document.addEventListener("DOMContentLoaded", function () {
       chevron.style.transition = "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
     });
 
-  // Helper to get only the filename from a URL
   function getFileName(url) {
     if (!url) return "";
     return url.split("/").pop().split("?")[0].split("#")[0];
   }
 
-  // Restore active submenu item from localStorage
   const lastActiveSubmenu = localStorage.getItem("lastActiveSubmenu");
   if (lastActiveSubmenu) {
     document.querySelectorAll(".submenu li a").forEach(function (link) {
@@ -271,4 +269,21 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     }
   };
+
+  if (
+    window.location.pathname.includes("country.php") ||
+    window.location.pathname.includes("state.php") ||
+    window.location.pathname.includes("district.php")
+  ) {
+    const locationDropdown = document.getElementById(
+      "locationDirectoryDropdown"
+    );
+    const locationChevron = document.getElementById("locationChevron");
+    if (locationDropdown && !locationDropdown.classList.contains("open")) {
+      locationDropdown.classList.add("open");
+      if (locationChevron) {
+        locationChevron.style.transform = "rotate(180deg)";
+      }
+    }
+  }
 });

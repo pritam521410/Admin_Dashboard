@@ -7,7 +7,7 @@
     >
       <i class="fa fa-globe"></i>
     </a>
-    Country Management
+    <?= $pageTitle ?>
   </h1>
-  <div class="breadcrumb">Home / Location Directory / Country</div>
+  <div class="breadcrumb"><?= implode(' / ', $breadcrumb) ?></div>
 </div>

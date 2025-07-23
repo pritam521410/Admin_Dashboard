@@ -1,19 +1,24 @@
 import Country from "../models/Country.model.js";
 import State from "../models/state.model.js";
+import District from "../models/district.model.js";
 export const getCounts = async (req, res) => {
   const counts = {};
   try {
-    const [countryCount, stateCount] = await Promise.all([
+    const [countryCount, stateCount, districtCount] = await Promise.all([
       Country.countDocuments(),
       State.countDocuments(),
+      District.countDocuments(),
     ]);
     counts.country = countryCount;
+    counts.state = stateCount;
+    counts.district = districtCount;
     res.status(200).json({
       success: true,
       message: "count retrieved successfully",
       data: {
         countryCount,
         stateCount,
+        districtCount,
       },
     });
   } catch (error) {

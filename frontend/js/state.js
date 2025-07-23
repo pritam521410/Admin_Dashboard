@@ -74,10 +74,116 @@ document.addEventListener("DOMContentLoaded", function () {
               : "<span class='na'>N/A</span>"
           }
         </td>
+        <td style="text-align:center;">
+          <button class="edit-state-btn" data-id="${
+            s._id
+          }" style="background:#fbbf24; color:#fff; border:none; border-radius:6px; padding:6px 14px; margin-right:6px; cursor:pointer; font-size:0.95rem;"><i class="fa fa-edit"></i> Edit</button>
+          <button class="delete-state-btn" data-id="${
+            s._id
+          }" style="background:#ef4444; color:#fff; border:none; border-radius:6px; padding:6px 14px; cursor:pointer; font-size:0.95rem;"><i class="fa fa-trash"></i> Delete</button>
+        </td>
       </tr>
     `
       )
       .join("");
+    // Add event listeners for edit and delete buttons
+    document.querySelectorAll(".edit-state-btn").forEach((btn) => {
+      btn.addEventListener("click", function () {
+        const id = this.getAttribute("data-id");
+        const state = states.find((s) => s._id === id);
+        if (state) openEditStateModal(state);
+      });
+    });
+    document.querySelectorAll(".delete-state-btn").forEach((btn) => {
+      btn.addEventListener("click", function () {
+        const id = this.getAttribute("data-id");
+        if (confirm("Are you sure you want to delete this state?")) {
+          deleteState(id);
+        }
+      });
+    });
+  }
+
+  // Modal logic
+  const editStateModal = document.getElementById("editStateModal");
+  const closeEditStateModalBtn = document.getElementById("closeEditStateModal");
+  const cancelEditStateBtn = document.getElementById("cancelEditStateBtn");
+  function openEditStateModal(state) {
+    document.getElementById("editStateId").value = state._id;
+    document.getElementById("editStateName").value = state.name;
+    document.getElementById("editStateCode").value = state.code;
+    document.getElementById("editStateDescription").value = state.description;
+    // Populate country dropdown
+    const countrySelect = document.getElementById("editStateCountry");
+    fetch("http://localhost:4000/api/country/all-countries")
+      .then((res) => res.json())
+      .then((countries) => {
+        countrySelect.innerHTML = "";
+        countries.forEach((country) => {
+          const option = document.createElement("option");
+          option.value = country._id;
+          option.textContent = country.name;
+          if (
+            state.country &&
+            country._id === (state.country._id || state.country)
+          ) {
+            option.selected = true;
+          }
+          countrySelect.appendChild(option);
+        });
+      });
+    if (editStateModal) editStateModal.style.display = "flex";
+  }
+  function closeEditStateModal() {
+    if (editStateModal) editStateModal.style.display = "none";
+  }
+  if (closeEditStateModalBtn)
+    closeEditStateModalBtn.onclick = closeEditStateModal;
+  if (cancelEditStateBtn) cancelEditStateBtn.onclick = closeEditStateModal;
+  window.onclick = function (event) {
+    if (event.target === editStateModal) closeEditStateModal();
+  };
+
+  // Edit form submit
+  const editStateForm = document.getElementById("editStateForm");
+  if (editStateForm) {
+    editStateForm.onsubmit = async function (e) {
+      e.preventDefault();
+      const id = document.getElementById("editStateId").value;
+      const formData = new FormData(editStateForm);
+      try {
+        const response = await fetch(
+          `http://localhost:4000/api/state/edit-state/${id}`,
+          {
+            method: "PUT",
+            body: formData,
+          }
+        );
+        const result = await response.json();
+        alert(result.message || "State updated!");
+        closeEditStateModal();
+        fetchStates();
+      } catch (error) {
+        alert("Failed to update state.");
+      }
+    };
+  }
+
+  // Delete state
+  async function deleteState(id) {
+    try {
+      const response = await fetch(
+        `http://localhost:4000/api/state/delete-state/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
+      const result = await response.json();
+      alert(result.message || "State deleted!");
+      fetchStates();
+    } catch (error) {
+      alert("Failed to delete state.");
+    }
   }
 
   // Fetch states from backend

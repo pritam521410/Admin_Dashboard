@@ -1,120 +1,147 @@
-document.addEventListener("DOMContentLoaded", function () {
-  // Dashboard JavaScript Functions
-  // Toggle submenu functions
-  function toggleSubmenu(dropdownId, chevronId) {
-    var dropdown = document.getElementById(dropdownId);
-    var chevron = document.getElementById(chevronId);
-    if (!dropdown.classList.contains("open")) {
-      dropdown.classList.add("open");
+// === Sidebar Submenu Toggle ===
+function toggleSubmenu(dropdownId, chevronId) {
+  const dropdown = document.getElementById(dropdownId);
+  const chevron = document.getElementById(chevronId);
+
+  if (dropdown) {
+    const isOpen = dropdown.classList.toggle("open");
+    if (chevron) {
+      chevron.style.transform = isOpen ? "rotate(180deg)" : "rotate(0deg)";
+      chevron.style.transition = "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
+    }
+  }
+}
+
+function keepSubmenuOpen(dropdownId, chevronId) {
+  const dropdown = document.getElementById(dropdownId);
+  const chevron = document.getElementById(chevronId);
+
+  if (dropdown && !dropdown.classList.contains("open")) {
+    dropdown.classList.add("open");
+    if (chevron) {
       chevron.style.transform = "rotate(180deg)";
       chevron.style.transition = "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
-    } else {
-      dropdown.classList.remove("open");
-      chevron.style.transform = "rotate(0deg)";
-      chevron.style.transition = "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
-      // Close all submenus inside this dropdown
-      dropdown.querySelectorAll(".submenu").forEach(function (sub) {
-        sub.classList.remove("open");
-      });
     }
   }
+}
 
-  // Keep submenu open when clicking on submenu items
-  function keepSubmenuOpen(dropdownId, chevronId) {
-    var dropdown = document.getElementById(dropdownId);
-    var chevron = document.getElementById(chevronId);
-    if (dropdown && !dropdown.classList.contains("open")) {
-      dropdown.classList.add("open");
-      if (chevron) {
-        chevron.style.transform = "rotate(180deg)";
-        chevron.style.transition =
-          "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
-      }
-    }
-  }
+const submenuToggles = {
+  locationDirectory: ["locationDirectoryDropdown", "locationChevron"],
+  masterData: ["masterDataDropdown", "masterChevron"],
+  collegeMaster: ["collegeMasterDropdown", "collegeChevron"],
+  examMaster: ["examMasterDropdown", "examChevron"],
+  advMaster: ["advMasterDropdown", "advChevron"],
+  enquiryData: ["enquiryDataDropdown", "enquiryChevron"],
+  extraPages: ["extraPagesDropdown", "extraPagesChevron"],
+};
 
-  function toggleLocationDirectory() {
-    toggleSubmenu("locationDirectoryMenu", "locationChevron");
-  }
-
-  function toggleMasterData() {
-    toggleSubmenu("masterDataDropdownMenu", "masterChevron");
-  }
-
-  function toggleCollegeMaster() {
-    toggleSubmenu("collegeMasterDropdown", "collegeChevron");
-  }
-
-  function toggleExamMaster() {
-    toggleSubmenu("examMasterDropdown", "examChevron");
-  }
-
-  function toggleAdvMaster() {
-    toggleSubmenu("advMasterDropdown", "advChevron");
-  }
-
-  function toggleEnquiryData() {
-    toggleSubmenu("enquiryDataDropdown", "enquiryChevron");
-  }
-
-  function toggleExtraPages() {
-    toggleSubmenu("extraPagesDropdown", "extraPagesChevron");
-  }
-
-  // REMOVE all sidebar logic (submenu open/close, chevron, toggle functions, keepSubmenuOpen, etc.) from this file. Only keep dashboard-specific logic. Sidebar logic will now be handled by script.js.
-  async function countForDashboard() {
-    try {
-      const res = await fetch(`${baseUrl}/get-counts`);
-
-      const data = await res.json();
-      console.log(data.data.countryCount, data.data.stateCount);
-
-      const countryCountForDashboard = document.getElementById(
-        "countryCountForDashboard"
-      );
-
-      const StateCountForDashboard = document.getElementById(
-        "StateCountForDashboard"
-      );
-      // console.log(data.data.country);
-      if (countryCountForDashboard) {
-        countryCountForDashboard.textContent = data.data.countryCount;
-      }
-      if (StateCountForDashboard) {
-        StateCountForDashboard.textContent = data.data.stateCount;
-      }
-    } catch (err) {
-      console.error("Fetch error:", err);
-    }
-  }
-  // Close sidebar on nav click (mobile only)
-
-  countForDashboard();
-
-  // Initialize dashboard when DOM is loaded
-  document.addEventListener("DOMContentLoaded", function () {
-    console.log("Dashboard initialized successfully");
-
-    // Auto-open Location Directory submenu if on country or state page
-    if (
-      window.location.pathname.includes("country.php") ||
-      window.location.pathname.includes("state.php")
-    ) {
-      const locationDropdown = document.getElementById(
-        "locationDirectoryDropdown"
-      );
-      const locationChevron = document.getElementById("locationChevron");
-      if (locationDropdown && !locationDropdown.classList.contains("open")) {
-        locationDropdown.classList.add("open");
-        if (locationChevron) {
-          locationChevron.style.transform = "rotate(180deg)";
-        }
-      }
-    }
-
-    // Add any additional initialization code here
-    // For example, loading dashboard data, setting up event listeners, etc.
-  });
+Object.entries(submenuToggles).forEach(([key, [dropdownId, chevronId]]) => {
+  window[`toggle${key.charAt(0).toUpperCase() + key.slice(1)}`] = () =>
+    toggleSubmenu(dropdownId, chevronId);
 });
 
-// Expose sidebar toggle functions globally for sidebar.php onclicks
+// === Sidebar (Mobile) ===
+const sidebar = document.querySelector(".sidebar");
+const sidebarToggle = document.getElementById("sidebarToggle");
+const sidebarOverlay = document.getElementById("sidebarOverlay");
+
+function openSidebar() {
+  sidebar?.classList.add("open");
+  sidebarOverlay?.classList.remove("hide");
+}
+
+function closeSidebar() {
+  sidebar?.classList.remove("open");
+  sidebarOverlay?.classList.add("hide");
+}
+
+sidebarToggle?.addEventListener("click", openSidebar);
+sidebarOverlay?.addEventListener("click", closeSidebar);
+
+// === Fetch Dashboard Counts ===
+async function countForDashboard() {
+  try {
+    const res = await fetch("http://localhost:4000/api/get-counts");
+    if (!res.ok) throw new Error(`API error: ${res.statusText}`);
+
+    const data = await res.json();
+    document.getElementById("countryCountForDashboard").textContent =
+      data.data?.countryCount ?? "-";
+    document.getElementById("StateCountForDashboard").textContent =
+      data.data?.stateCount ?? "-";
+    document.getElementById("districtCountForDashboard").textContent =
+      data.data?.districtCount ?? "-";
+  } catch (err) {
+    console.error("Dashboard count fetch failed:", err);
+    [
+      "countryCountForDashboard",
+      "StateCountForDashboard",
+      "districtCountForDashboard",
+    ].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = "-";
+    });
+  }
+}
+
+// === Stream & Degree Count ===
+async function streamCountForDashboard() {
+  try {
+    const [streamRes, degreeRes] = await Promise.all([
+      fetch("http://localhost:4000/api/stream/all"),
+      fetch("http://localhost:4000/api/degree/all"),
+    ]);
+
+    const streamData = await streamRes.json();
+    const degreeData = await degreeRes.json();
+
+    document.getElementById("streamCountForDashboard").textContent =
+      streamData.data?.length ?? "-";
+    document.getElementById("degreeCountForDashboard").textContent =
+      degreeData.degrees?.length ?? "-";
+  } catch (err) {
+    console.error("Stream/Degree fetch failed:", err);
+  }
+}
+
+// === Fullscreen Handling ===
+const fullscreenToggle = document.getElementById("fullscreenToggle");
+
+fullscreenToggle?.addEventListener("click", () => {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+  } else {
+    document.exitFullscreen();
+  }
+});
+
+document.addEventListener("fullscreenchange", () => {
+  document.body.classList.toggle(
+    "fullscreen-active",
+    !!document.fullscreenElement
+  );
+  if (!document.fullscreenElement) return;
+  closeSidebar();
+});
+
+// === Init on DOMContentLoaded ===
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("Dashboard initialized successfully");
+
+  // Auto-expand Location Directory submenu on specific page
+  if (window.location.pathname.includes("country.php")) {
+    keepSubmenuOpen("locationDirectoryDropdown", "locationChevron");
+  }
+
+  countForDashboard();
+  streamCountForDashboard();
+});
+
+// === Prevent Sidebar Close on Submenu Click ===
+document.querySelectorAll(".sidebar nav .submenu li a").forEach((link) => {
+  link.addEventListener("click", (e) => {
+    if (window.innerWidth <= 900) {
+      e.stopPropagation(); // Allow navigation but don't close sidebar
+    }
+  });
+});

@@ -8,16 +8,16 @@
     Admin Panel
   </div>
   <nav>
-    <ul>
-      <li>
+    <ul class="menu-list">
+      <li class="menu-item">
         <a href="dashboard.php" class="active"
           ><i class="fa fa-th-large"></i
           ><span class="menu-label">Dashboard</span
           ><span class="badge">New</span></a
         >
       </li>
-      <li class="has-submenu" id="locationDirectoryMenu">
-        <button class="menu-btn" onclick="toggleLocationDirectory()"> 
+      <li class="menu-item has-submenu" id="locationDirectoryMenu">
+        <button class="menu-btn" onclick="toggleLocationDirectory()">
           <i class="fa fa-database"></i
           ><span class="menu-label">Location Directory</span>
           <i
@@ -58,7 +58,7 @@
           <li>
             <a
               href="district.php"
-              onclick="keepSubmenuOpen('locationDirectoryDropdown', 'locationChevron')"
+                onclick="keepSubmenuOpen('locationDirectoryDropdown', 'locationChevron')"
               style="
                 color: inherit;
                 text-decoration: none;
@@ -69,7 +69,7 @@
           </li>
         </ul>
       </li>
-      <li class="has-submenu" id="masterDataMenu">
+      <li class="menu-item has-submenu" id="masterDataMenu">
         <button class="menu-btn" onclick="toggleMasterData()">
           <i class="fa fa-database"></i
           ><span class="menu-label">Master Data</span>
@@ -207,7 +207,7 @@
           </li>
         </ul>
       </li>
-      <li class="has-submenu" id="collegeMasterMenu">
+      <li class="menu-item has-submenu" id="collegeMasterMenu">
         <button class="menu-btn" onclick="toggleCollegeMaster()">
           <i class="fa fa-university"></i
           ><span class="menu-label">College Master</span>
@@ -257,7 +257,7 @@
           </li>
         </ul>
       </li>
-      <li class="has-submenu" id="examMasterMenu">
+      <li class="menu-item has-submenu" id="examMasterMenu">
         <button class="menu-btn" onclick="toggleExamMaster()">
           <i class="fa fa-file-alt"></i
           ><span class="menu-label">Exam Master</span>
@@ -307,7 +307,7 @@
           </li>
         </ul>
       </li>
-      <li class="has-submenu" id="advMasterMenu">
+      <li class="menu-item has-submenu" id="advMasterMenu">
         <button class="menu-btn" onclick="toggleAdvMaster()">
           <span
             style="
@@ -356,7 +356,7 @@
           </li>
         </ul>
       </li>
-      <li class="has-submenu" id="enquiryDataMenu">
+      <li class="menu-item has-submenu" id="enquiryDataMenu">
         <button class="menu-btn" onclick="toggleEnquiryData()">
           <i class="fa fa-users"></i
           ><span class="menu-label">Enquiry Data</span>
@@ -406,7 +406,7 @@
           </li>
         </ul>
       </li>
-      <li class="has-submenu" id="extraPagesMenu">
+      <li class="menu-item has-submenu" id="extraPagesMenu">
         <button class="menu-btn" onclick="toggleExtraPages()">
           <i class="fa fa-cog"></i
           ><span class="menu-label">Extra Pages</span>

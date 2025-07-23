@@ -1,6 +1,11 @@
 import express from "express";
 import { upload } from "../middlewares/multer.middleware.js";
-import { addState, getAllStates } from "../controllers/state.controller.js";
+import {
+  addState,
+  getAllStates,
+  editState,
+  deleteState,
+} from "../controllers/state.controller.js";
 
 const router = express.Router();
 
@@ -16,5 +21,16 @@ router.post(
   ]),
   addState
 );
+
+router.put(
+  "/edit-state/:id",
+  upload.fields([
+    { name: "logo", maxCount: 1 },
+    { name: "flag", maxCount: 1 },
+  ]),
+  editState
+);
+
+router.delete("/delete-state/:id", deleteState);
 
 export default router;
