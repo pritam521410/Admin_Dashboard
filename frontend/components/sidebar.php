@@ -17,7 +17,7 @@
         >
       </li>
       <li class="has-submenu" id="locationDirectoryMenu">
-        <button class="menu-btn" onclick="toggleLocationDirectory()">
+        <button class="menu-btn" onclick="toggleLocationDirectory()"> 
           <i class="fa fa-database"></i
           ><span class="menu-label">Location Directory</span>
           <i
@@ -57,7 +57,7 @@
           </li>
           <li>
             <a
-              href="district.html"
+              href="district.php"
               onclick="keepSubmenuOpen('locationDirectoryDropdown', 'locationChevron')"
               style="
                 color: inherit;

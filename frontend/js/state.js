@@ -3,6 +3,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const stateForm = document.getElementById("stateForm");
   const formDiv = document.getElementById("formDiv");
   const listDiv = document.getElementById("listDiv");
+  const stateDropdown = document.getElementById("stateDropdown");
+  let allStates = [];
 
   // Populate country dropdown
   fetch("http://localhost:4000/api/country/all-countries")
@@ -17,61 +19,33 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     });
 
-  function toggleSubmenu(dropdownId, chevronId) {
-    var dropdown = document.getElementById(dropdownId);
-    var chevron = document.getElementById(chevronId);
-    if (!dropdown.classList.contains("open")) {
-      dropdown.classList.add("open");
-      chevron.style.transform = "rotate(180deg)";
-      chevron.style.transition = "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
-    } else {
-      dropdown.classList.remove("open");
-      chevron.style.transform = "rotate(0deg)";
-      chevron.style.transition = "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
-    }
-  }
+  // Fetch all states on page load and store
+  fetch("http://localhost:4000/api/state/all-states")
+    .then((response) => response.json())
+    .then((states) => {
+      if (!Array.isArray(states)) return;
+      allStates = states;
+    });
 
-  function toggleLocationDirectory() {
-    toggleSubmenu("locationDirectoryDropdown", "locationChevron");
-  }
-
-  function toggleMasterData() {
-    toggleSubmenu("masterDataDropdown", "masterChevron");
-  }
-
-  function toggleCollegeMaster() {
-    toggleSubmenu("collegeMasterDropdown", "collegeChevron");
-  }
-
-  function toggleExamMaster() {
-    toggleSubmenu("examMasterDropdown", "examChevron");
-  }
-
-  function toggleAdvMaster() {
-    toggleSubmenu("advMasterDropdown", "advChevron");
-  }
-
-  function toggleEnquiryData() {
-    toggleSubmenu("enquiryDataDropdown", "enquiryChevron");
-  }
-
-  function toggleExtraPages() {
-    toggleSubmenu("extraPagesDropdown", "extraPagesChevron");
-  }
-
-  // Keep submenu open when clicking on submenu items
-  function keepSubmenuOpen(dropdownId, chevronId) {
-    var dropdown = document.getElementById(dropdownId);
-    var chevron = document.getElementById(chevronId);
-    if (dropdown && !dropdown.classList.contains("open")) {
-      dropdown.classList.add("open");
-      if (chevron) {
-        chevron.style.transform = "rotate(180deg)";
-        chevron.style.transition =
-          "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
-      }
-    }
-  }
+  // On country change, filter states from allStates
+  countryDropdown.addEventListener("change", function () {
+    const selectedCountryId = countryDropdown.value;
+    if (!stateDropdown) return;
+    stateDropdown.innerHTML = '<option value="">-- Select State --</option>';
+    if (!selectedCountryId) return;
+    allStates
+      .filter(
+        (state) =>
+          state.country &&
+          String(state.country._id) === String(selectedCountryId)
+      )
+      .forEach((state) => {
+        const option = document.createElement("option");
+        option.value = state._id;
+        option.textContent = state.name;
+        stateDropdown.appendChild(option);
+      });
+  });
 
   // Render state table
   function renderStateTable(states) {
@@ -120,33 +94,16 @@ document.addEventListener("DOMContentLoaded", function () {
   // On page load, show state list
   fetchStates();
 
-  // Highlight the State link in the sidebar as active
-  const stateSidebarLink = document.querySelector('a[href="state.php"]');
-  if (stateSidebarLink) {
-    stateSidebarLink.classList.add("active");
-    stateSidebarLink.style.background = "#2563eb";
-    stateSidebarLink.style.color = "#fff";
-    // Remove active from siblings
-    const submenuLinks =
-      stateSidebarLink.parentElement.parentElement.querySelectorAll("a");
-    submenuLinks.forEach((link) => {
-      if (link !== stateSidebarLink) {
-        link.classList.remove("active");
-        link.style.background = "";
-        link.style.color = "";
-      }
-    });
-  }
-
-  // Auto-open Location Directory submenu if on state.php
-  const locationDropdown = document.getElementById("locationDirectoryDropdown");
-  const locationChevron = document.getElementById("locationChevron");
-  if (locationDropdown && !locationDropdown.classList.contains("open")) {
-    locationDropdown.classList.add("open");
-    if (locationChevron) {
-      locationChevron.style.transform = "rotate(180deg)";
-    }
-  }
+  // On page load, close all sidebar submenus and reset chevrons
+  // document.querySelectorAll(".sidebar .submenu").forEach(function (submenu) {
+  //   submenu.classList.remove("open");
+  // });
+  // document
+  //   .querySelectorAll(".sidebar .fa-chevron-down")
+  //   .forEach(function (chevron) {
+  //     chevron.style.transform = "rotate(0deg)";
+  //     chevron.style.transition = "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
+  //   });
 
   // Prevent sidebar from closing on submenu item click (for mobile)
   document.querySelectorAll(".sidebar nav .submenu li a").forEach((a) => {
@@ -164,13 +121,11 @@ document.addEventListener("DOMContentLoaded", function () {
     showFormBtn.addEventListener("click", function () {
       formDiv.style.display = "block";
       listDiv.style.display = "none";
-      // Focus the State Name input
-      const stateNameInput = stateForm
-        ? stateForm.querySelector('input[name="code"]')
-        : null;
-      if (stateNameInput) {
-        stateNameInput.focus();
-      }
+      // Remove auto-focus from State Name input
+      // const stateNameInput = stateForm ? stateForm.querySelector('input[name="code"]') : null;
+      // if (stateNameInput) {
+      //   stateNameInput.focus();
+      // }
     });
     showListBtn.addEventListener("click", function () {
       formDiv.style.display = "none";
@@ -208,4 +163,22 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     };
   }
+
+  // On page load, force remove .active class, blur, and reset background/color for all submenu links
+  // document.querySelectorAll(".submenu li a").forEach(function (link) {
+  //   link.classList.remove("active");
+  //   link.blur();
+  //   link.style.background = "";
+  //   link.style.color = "";
+  // });
 });
+
+// Force all chevrons to 0deg after all scripts and DOM are loaded
+window.onload = function () {
+  document
+    .querySelectorAll(".sidebar .fa-chevron-down")
+    .forEach(function (chevron) {
+      chevron.style.transform = "rotate(0deg)";
+      chevron.style.transition = "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
+    });
+};

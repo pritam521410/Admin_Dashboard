@@ -12,6 +12,10 @@ document.addEventListener("DOMContentLoaded", function () {
       dropdown.classList.remove("open");
       chevron.style.transform = "rotate(0deg)";
       chevron.style.transition = "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
+      // Close all submenus inside this dropdown
+      dropdown.querySelectorAll(".submenu").forEach(function (sub) {
+        sub.classList.remove("open");
+      });
     }
   }
 
@@ -30,11 +34,11 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function toggleLocationDirectory() {
-    toggleSubmenu("locationDirectoryDropdown", "locationChevron");
+    toggleSubmenu("locationDirectoryMenu", "locationChevron");
   }
 
   function toggleMasterData() {
-    toggleSubmenu("masterDataDropdown", "masterChevron");
+    toggleSubmenu("masterDataDropdownMenu", "masterChevron");
   }
 
   function toggleCollegeMaster() {
@@ -57,29 +61,7 @@ document.addEventListener("DOMContentLoaded", function () {
     toggleSubmenu("extraPagesDropdown", "extraPagesChevron");
   }
 
-  // Sidebar toggle for mobile
-  const sidebar = document.querySelector(".sidebar");
-  const sidebarToggle = document.getElementById("sidebarToggle");
-  const sidebarOverlay = document.getElementById("sidebarOverlay");
-
-  function openSidebar() {
-    sidebar.classList.add("open");
-    sidebarOverlay.classList.remove("hide");
-  }
-
-  function closeSidebar() {
-    sidebar.classList.remove("open");
-    sidebarOverlay.classList.add("hide");
-  }
-
-  // Event listeners for sidebar functionality
-  if (sidebarToggle) {
-    sidebarToggle.addEventListener("click", openSidebar);
-  }
-
-  if (sidebarOverlay) {
-    sidebarOverlay.addEventListener("click", closeSidebar);
-  }
+  // REMOVE all sidebar logic (submenu open/close, chevron, toggle functions, keepSubmenuOpen, etc.) from this file. Only keep dashboard-specific logic. Sidebar logic will now be handled by script.js.
   async function countForDashboard() {
     try {
       const res = await fetch(`${baseUrl}/get-counts`);
@@ -109,62 +91,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   countForDashboard();
 
-  document.addEventListener("DOMContentLoaded", function () {
-    // Handle main menu items (not submenu items)
-    document.querySelectorAll(".sidebar nav > ul > li").forEach((el) => {
-      let a = el.querySelector("a");
-      if (a) {
-        a.addEventListener("click", () => {
-          if (window.innerWidth <= 900) {
-            if (el.classList.contains("has-submenu")) {
-              const menuId = el.id;
-              const chevronId = menuId + "Chevron";
-              toggleSubmenu(menuId, chevronId);
-            } else {
-              closeSidebar();
-            }
-          }
-        });
-      }
-    });
-
-    // Handle submenu items separately - don't close sidebar when clicking on them
-    document.querySelectorAll(".sidebar nav .submenu li a").forEach((a) => {
-      a.addEventListener("click", (e) => {
-        // Prevent the click from bubbling up to parent elements
-        e.stopPropagation();
-
-        if (window.innerWidth <= 900) {
-          // Don't close sidebar when clicking on submenu items
-          // The navigation will happen naturally
-        }
-      });
-    });
-  });
-
-  // Fullscreen logic
-  const fullscreenToggle = document.getElementById("fullscreenToggle");
-
-  if (fullscreenToggle) {
-    fullscreenToggle.addEventListener("click", function () {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen();
-      } else {
-        document.exitFullscreen();
-      }
-    });
-  }
-
-  document.addEventListener("fullscreenchange", function () {
-    if (document.fullscreenElement) {
-      document.body.classList.add("fullscreen-active");
-      // Also close sidebar if open
-      closeSidebar();
-    } else {
-      document.body.classList.remove("fullscreen-active");
-    }
-  });
-
   // Initialize dashboard when DOM is loaded
   document.addEventListener("DOMContentLoaded", function () {
     console.log("Dashboard initialized successfully");
@@ -189,14 +115,6 @@ document.addEventListener("DOMContentLoaded", function () {
     // Add any additional initialization code here
     // For example, loading dashboard data, setting up event listeners, etc.
   });
-
-  window.toggleLocationDirectory = toggleLocationDirectory;
-  window.toggleMasterData = toggleMasterData;
-  window.toggleCollegeMaster = toggleCollegeMaster;
-  window.toggleExamMaster = toggleExamMaster;
-  window.toggleAdvMaster = toggleAdvMaster;
-  window.toggleEnquiryData = toggleEnquiryData;
-  window.toggleExtraPages = toggleExtraPages;
 });
 
 // Expose sidebar toggle functions globally for sidebar.php onclicks

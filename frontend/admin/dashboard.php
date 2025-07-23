@@ -30,10 +30,10 @@
             <span class="more-info">More info <i class="fa fa-arrow-circle-right"></i></span>
           </div>
         </a>
-        <a href="#" style="text-decoration: none">
+        <a href="district.php" style="text-decoration: none">
           <div class="card card-purple">
             <div class="card-title">District</div>
-            <div class="card-value">6208</div>
+            <div class="card-value" id="districtCountForDashboard">0</div>
             <span class="more-info">More info <i class="fa fa-arrow-circle-right"></i></span>
           </div>
         </a>

@@ -29,7 +29,7 @@ export const addState = async (req, res) => {
 
 export const getAllStates = async (req, res) => {
   try {
-    const states = await State.find().populate("country", "name");
+    const states = await State.find().populate("country", "_id name");
     res.status(200).json(states);
   } catch (error) {
     console.error("Fetch error:", error.message);
