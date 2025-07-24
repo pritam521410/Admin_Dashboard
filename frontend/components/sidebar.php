@@ -86,7 +86,7 @@
         >
           <li>
             <a
-              href="stream.html"
+              href="stream.php"
               style="
                 color: inherit;
                 text-decoration: none;
@@ -97,7 +97,7 @@
           </li>
           <li>
             <a
-              href="degreetype.html"
+              href="degree.php"
               style="
                 color: inherit;
                 text-decoration: none;
@@ -108,7 +108,7 @@
           </li>
           <li>
             <a
-              href="coursename.html"
+              href="../admin/course.php"
               style="
                 color: inherit;
                 text-decoration: none;
@@ -130,7 +130,7 @@
           </li>
           <li>
             <a
-              href="courseduration.html"
+              href="../admin/course_duration.php"
               style="
                 color: inherit;
                 text-decoration: none;
@@ -141,7 +141,7 @@
           </li>
           <li>
             <a
-              href="affiliationname.html"
+              href="../admin/affilication.php"
               style="
                 color: inherit;
                 text-decoration: none;
@@ -152,7 +152,7 @@
           </li>
           <li>
             <a
-              href="approvedthrough.html"
+              href="../admin/approvedThrough.php"
               style="
                 color: inherit;
                 text-decoration: none;
@@ -163,18 +163,18 @@
           </li>
           <li>
             <a
-              href="examthrough.html"
+              href="../admin/examType.php"
               style="
                 color: inherit;
                 text-decoration: none;
                 padding-left: 40px;
               "
-              >Exam Through</a
+              >Exam Type</a
             >
           </li>
           <li>
             <a
-              href="ranking.html"
+              href="../admin/ranking.php"
               style="
                 color: inherit;
                 text-decoration: none;
@@ -185,7 +185,7 @@
           </li>
           <li>
             <a
-              href="ownership.html"
+              href="../admin/ownership.php"
               style="
                 color: inherit;
                 text-decoration: none;
@@ -196,7 +196,7 @@
           </li>
           <li>
             <a
-              href="college-facilities.html"
+              href="../admin/collegeFacility.php"
               style="
                 color: inherit;
                 text-decoration: none;

@@ -6,7 +6,16 @@ import path from "path";
 import { connectDB } from "./db.js";
 import countryRoutes from "./Route/country.routes.js";
 import commonRoutes from "./Route/common.routes.js";
-
+import streamRoutes from "./Route/stream.route.js";
+import degreeRoutes from "./Route/degree.route.js";
+import courseRoutes from "./Route/course.route.js";
+import courseDurationRoutes from "./Route/course_duration.route.js";
+import affilicationRoutes from "./Route/affilication.route.js";
+import approvedThroughRoutes from "./Route/approvedThrough.route.js";
+import examTypeRoutes from "./Route/examType.route.js";
+import rankingRoutes from "./Route/ranking.route.js";
+import ownershipRoutes from "./Route/ownership.route.js";
+import collegeFacilityRoutes from "./Route/collegeFacility.route.js";
 const app = express();
 dotenv.config();
 const PORT = process.env.PORT || 4000;
@@ -40,6 +49,16 @@ export const upload = multer({ storage });
 
 app.use("/api/country", countryRoutes);
 app.use("/api/", commonRoutes);
+app.use("/api/stream", streamRoutes);
+app.use("/api/degree", degreeRoutes);
+app.use("/api/course", courseRoutes);
+app.use("/api/course-duration", courseDurationRoutes);
+app.use("/api/affilication", affilicationRoutes);
+app.use("/api/approved-through", approvedThroughRoutes);
+app.use("/api/exam-type", examTypeRoutes);
+app.use("/api/ranking", rankingRoutes);
+app.use("/api/ownership", ownershipRoutes);
+app.use("/api/college-facility", collegeFacilityRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
