@@ -44,4 +44,4 @@
     <i class="fa fa-expand-arrows-alt"></i>
   </button>
 </div>
-<div class="sidebar-overlay hide" id="sidebarOverlay"></div> 
+<div class="sidebar-overlay hide" id="sidebarOverlay"></div>

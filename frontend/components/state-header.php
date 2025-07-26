@@ -5,9 +5,9 @@
       href="admin/dashboard.php"
       style="color: inherit; text-decoration: none"
     >
-      <i class="fa fa-globe"></i>
+      <i class="fa fa-city"></i>
     </a>
-    Country Management
+    State Management
   </h1>
-  <div class="breadcrumb">Home / Master Data / Country</div>
-</div> 
+  <div class="breadcrumb">Home / Location Directory / State</div>
+</div>

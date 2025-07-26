@@ -2121,3 +2121,70 @@ body.fullscreen-active .main {
 body.fullscreen-active .topbar {
   display: none !important;
 }
+
+.custom-select {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 2px solid #e5e7eb;
+  font-size: 1rem;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  appearance: none;
+  outline: none;
+}
+.custom-select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px #2563eb22;
+}
+.custom-select:hover {
+  border-color: #2563eb;
+}
+
+/* State Table UI Improvements */
+.state-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+  min-width: 800px;
+}
+.state-table th,
+.state-table td {
+  padding: 14px 10px;
+  font-size: 1rem;
+  text-align: left;
+  vertical-align: middle;
+  border-bottom: 1px solid #f3f4f6;
+  max-width: 180px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.state-table th {
+  background: #f8fafc;
+  color: #374151;
+  font-weight: 600;
+}
+.state-table tr:nth-child(even) {
+  background: #f9fafb;
+}
+.state-table tr:hover {
+  background: #e0e7ef;
+  transition: background 0.2s;
+}
+.state-table img {
+  border-radius: 6px;
+  border: 1.5px solid #e5e7eb;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  object-fit: cover;
+}
+.state-table .na {
+  color: #9ca3af;
+  font-style: italic;
+  font-size: 0.97em;
+}

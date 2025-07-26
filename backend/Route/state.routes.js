@@ -1,34 +1,36 @@
 import express from "express";
 import { upload } from "../middlewares/multer.middleware.js";
 import {
-  addCountry,
-  getAllCountries,
-  editCountry,
-  deleteCountry,
-} from "../controllers/country.controller.js";
+  addState,
+  getAllStates,
+  editState,
+  deleteState,
+} from "../controllers/state.controller.js";
 
 const router = express.Router();
 
+// Get all states
+router.get("/all-states", getAllStates);
+
+// Add state (with file upload)
 router.post(
-  "/add-country",
+  "/add-state",
   upload.fields([
     { name: "logo", maxCount: 1 },
     { name: "flag", maxCount: 1 },
   ]),
-  addCountry
+  addState
 );
-
-router.get("/all-countries", getAllCountries);
 
 router.put(
-  "/edit-country/:id",
+  "/edit-state/:id",
   upload.fields([
     { name: "logo", maxCount: 1 },
     { name: "flag", maxCount: 1 },
   ]),
-  editCountry
+  editState
 );
 
-router.delete("/delete-country/:id", deleteCountry);
+router.delete("/delete-state/:id", deleteState);
 
 export default router;

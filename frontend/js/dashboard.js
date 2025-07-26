@@ -1,24 +1,21 @@
-// Dashboard JavaScript Functions
-
-// Toggle submenu functions
+// === Sidebar Submenu Toggle ===
 function toggleSubmenu(dropdownId, chevronId) {
-  var dropdown = document.getElementById(dropdownId);
-  var chevron = document.getElementById(chevronId);
-  if (!dropdown.classList.contains("open")) {
-    dropdown.classList.add("open");
-    chevron.style.transform = "rotate(180deg)";
-    chevron.style.transition = "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
-  } else {
-    dropdown.classList.remove("open");
-    chevron.style.transform = "rotate(0deg)";
-    chevron.style.transition = "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
+  const dropdown = document.getElementById(dropdownId);
+  const chevron = document.getElementById(chevronId);
+
+  if (dropdown) {
+    const isOpen = dropdown.classList.toggle("open");
+    if (chevron) {
+      chevron.style.transform = isOpen ? "rotate(180deg)" : "rotate(0deg)";
+      chevron.style.transition = "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
+    }
   }
 }
 
-// Keep submenu open when clicking on submenu items
 function keepSubmenuOpen(dropdownId, chevronId) {
-  var dropdown = document.getElementById(dropdownId);
-  var chevron = document.getElementById(chevronId);
+  const dropdown = document.getElementById(dropdownId);
+  const chevron = document.getElementById(chevronId);
+
   if (dropdown && !dropdown.classList.contains("open")) {
     dropdown.classList.add("open");
     if (chevron) {
@@ -28,149 +25,125 @@ function keepSubmenuOpen(dropdownId, chevronId) {
   }
 }
 
-function toggleLocationDirectory() {
-  toggleSubmenu("locationDirectoryDropdown", "locationChevron");
-}
+const submenuToggles = {
+  locationDirectory: ["locationDirectoryDropdown", "locationChevron"],
+  masterData: ["masterDataDropdown", "masterChevron"],
+  collegeMaster: ["collegeMasterDropdown", "collegeChevron"],
+  examMaster: ["examMasterDropdown", "examChevron"],
+  advMaster: ["advMasterDropdown", "advChevron"],
+  enquiryData: ["enquiryDataDropdown", "enquiryChevron"],
+  extraPages: ["extraPagesDropdown", "extraPagesChevron"],
+};
 
-function toggleMasterData() {
-  toggleSubmenu("masterDataDropdown", "masterChevron");
-}
+Object.entries(submenuToggles).forEach(([key, [dropdownId, chevronId]]) => {
+  window[`toggle${key.charAt(0).toUpperCase() + key.slice(1)}`] = () =>
+    toggleSubmenu(dropdownId, chevronId);
+});
 
-function toggleCollegeMaster() {
-  toggleSubmenu("collegeMasterDropdown", "collegeChevron");
-}
-
-function toggleExamMaster() {
-  toggleSubmenu("examMasterDropdown", "examChevron");
-}
-
-function toggleAdvMaster() {
-  toggleSubmenu("advMasterDropdown", "advChevron");
-}
-
-function toggleEnquiryData() {
-  toggleSubmenu("enquiryDataDropdown", "enquiryChevron");
-}
-
-function toggleExtraPages() {
-  toggleSubmenu("extraPagesDropdown", "extraPagesChevron");
-}
-
-// Sidebar toggle for mobile
+// === Sidebar (Mobile) ===
 const sidebar = document.querySelector(".sidebar");
 const sidebarToggle = document.getElementById("sidebarToggle");
 const sidebarOverlay = document.getElementById("sidebarOverlay");
 
 function openSidebar() {
-  sidebar.classList.add("open");
-  sidebarOverlay.classList.remove("hide");
+  sidebar?.classList.add("open");
+  sidebarOverlay?.classList.remove("hide");
 }
 
 function closeSidebar() {
-  sidebar.classList.remove("open");
-  sidebarOverlay.classList.add("hide");
+  sidebar?.classList.remove("open");
+  sidebarOverlay?.classList.add("hide");
 }
 
-// Event listeners for sidebar functionality
-if (sidebarToggle) {
-  sidebarToggle.addEventListener("click", openSidebar);
-}
+sidebarToggle?.addEventListener("click", openSidebar);
+sidebarOverlay?.addEventListener("click", closeSidebar);
 
-if (sidebarOverlay) {
-  sidebarOverlay.addEventListener("click", closeSidebar);
-}
+// === Fetch Dashboard Counts ===
 async function countForDashboard() {
   try {
     const res = await fetch("http://localhost:4000/api/get-counts");
+    if (!res.ok) throw new Error(`API error: ${res.statusText}`);
+
     const data = await res.json();
-    const countryCountForDashboard = document.getElementById(
-      "countryCountForDashboard"
-    );
-    // console.log(data.data.country);
-    countryCountForDashboard.textContent = data.data.country;
+    document.getElementById("countryCountForDashboard").textContent =
+      data.data?.countryCount ?? "-";
+    document.getElementById("StateCountForDashboard").textContent =
+      data.data?.stateCount ?? "-";
+    document.getElementById("districtCountForDashboard").textContent =
+      data.data?.districtCount ?? "-";
   } catch (err) {
-    console.error("Fetch error:", err);
+    console.error("Dashboard count fetch failed:", err);
+    [
+      "countryCountForDashboard",
+      "StateCountForDashboard",
+      "districtCountForDashboard",
+    ].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = "-";
+    });
   }
 }
-// Close sidebar on nav click (mobile only)
 
-countForDashboard();
-document.addEventListener("DOMContentLoaded", function () {
-  // Handle main menu items (not submenu items)
-  document.querySelectorAll(".sidebar nav > ul > li").forEach((el) => {
-    let a = el.querySelector("a");
-    if (a) {
-      a.addEventListener("click", () => {
-        if (window.innerWidth <= 900) {
-          if (el.classList.contains("has-submenu")) {
-            const menuId = el.id;
-            const chevronId = menuId + "Chevron";
-            toggleSubmenu(menuId, chevronId);
-          } else {
-            closeSidebar();
-          }
-        }
-      });
-    }
-  });
+// === Stream & Degree Count ===
+async function streamCountForDashboard() {
+  try {
+    const [streamRes, degreeRes] = await Promise.all([
+      fetch("http://localhost:4000/api/stream/all"),
+      fetch("http://localhost:4000/api/degree/all"),
+    ]);
 
-  // Handle submenu items separately - don't close sidebar when clicking on them
-  document.querySelectorAll(".sidebar nav .submenu li a").forEach((a) => {
-    a.addEventListener("click", (e) => {
-      // Prevent the click from bubbling up to parent elements
-      e.stopPropagation();
+    const streamData = await streamRes.json();
+    const degreeData = await degreeRes.json();
 
-      if (window.innerWidth <= 900) {
-        // Don't close sidebar when clicking on submenu items
-        // The navigation will happen naturally
-      }
-    });
-  });
-});
+    document.getElementById("streamCountForDashboard").textContent =
+      streamData.data?.length ?? "-";
+    document.getElementById("degreeCountForDashboard").textContent =
+      degreeData.degrees?.length ?? "-";
+  } catch (err) {
+    console.error("Stream/Degree fetch failed:", err);
+  }
+}
 
-// Fullscreen logic
+// === Fullscreen Handling ===
 const fullscreenToggle = document.getElementById("fullscreenToggle");
 
-if (fullscreenToggle) {
-  fullscreenToggle.addEventListener("click", function () {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen();
-    } else {
-      document.exitFullscreen();
-    }
-  });
-}
-
-document.addEventListener("fullscreenchange", function () {
-  if (document.fullscreenElement) {
-    document.body.classList.add("fullscreen-active");
-    // Also close sidebar if open
-    closeSidebar();
+fullscreenToggle?.addEventListener("click", () => {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
   } else {
-    document.body.classList.remove("fullscreen-active");
+    document.exitFullscreen();
   }
 });
 
-// Initialize dashboard when DOM is loaded
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("fullscreenchange", () => {
+  document.body.classList.toggle(
+    "fullscreen-active",
+    !!document.fullscreenElement
+  );
+  if (!document.fullscreenElement) return;
+  closeSidebar();
+});
+
+// === Init on DOMContentLoaded ===
+document.addEventListener("DOMContentLoaded", () => {
   console.log("Dashboard initialized successfully");
 
-  // Auto-open Location Directory submenu if on country page
+  // Auto-expand Location Directory submenu on specific page
   if (window.location.pathname.includes("country.php")) {
-    const locationDropdown = document.getElementById(
-      "locationDirectoryDropdown"
-    );
-    const locationChevron = document.getElementById("locationChevron");
-    if (locationDropdown && !locationDropdown.classList.contains("open")) {
-      locationDropdown.classList.add("open");
-      if (locationChevron) {
-        locationChevron.style.transform = "rotate(180deg)";
-      }
-    }
+    keepSubmenuOpen("locationDirectoryDropdown", "locationChevron");
   }
 
-  // Add any additional initialization code here
-  // For example, loading dashboard data, setting up event listeners, etc.
+  countForDashboard();
+  streamCountForDashboard();
+});
+
+// === Prevent Sidebar Close on Submenu Click ===
+document.querySelectorAll(".sidebar nav .submenu li a").forEach((link) => {
+  link.addEventListener("click", (e) => {
+    if (window.innerWidth <= 900) {
+      e.stopPropagation(); // Allow navigation but don't close sidebar
+    }
+  });
 });
 
 // Stream count for dashboard

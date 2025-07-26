@@ -6,6 +6,7 @@ import path from "path";
 import { connectDB } from "./db.js";
 import countryRoutes from "./Route/country.routes.js";
 import commonRoutes from "./Route/common.routes.js";
+<<<<<<< HEAD
 import streamRoutes from "./Route/stream.route.js";
 import degreeRoutes from "./Route/degree.route.js";
 import courseRoutes from "./Route/course.route.js";
@@ -16,6 +17,11 @@ import examTypeRoutes from "./Route/examType.route.js";
 import rankingRoutes from "./Route/ranking.route.js";
 import ownershipRoutes from "./Route/ownership.route.js";
 import collegeFacilityRoutes from "./Route/collegeFacility.route.js";
+=======
+import stateRoutes from "./Route/state.routes.js";
+import districtRoutes from "./Route/district.routes.js";
+
+>>>>>>> e0420d1fccaa5caf72436bb5387e0adf35ebf468
 const app = express();
 dotenv.config();
 const PORT = process.env.PORT || 4000;
@@ -49,6 +55,7 @@ export const upload = multer({ storage });
 
 app.use("/api/country", countryRoutes);
 app.use("/api/", commonRoutes);
+<<<<<<< HEAD
 app.use("/api/stream", streamRoutes);
 app.use("/api/degree", degreeRoutes);
 app.use("/api/course", courseRoutes);
@@ -59,6 +66,10 @@ app.use("/api/exam-type", examTypeRoutes);
 app.use("/api/ranking", rankingRoutes);
 app.use("/api/ownership", ownershipRoutes);
 app.use("/api/college-facility", collegeFacilityRoutes);
+=======
+app.use("/api/state", stateRoutes);
+app.use("/api/district", districtRoutes);
+>>>>>>> e0420d1fccaa5caf72436bb5387e0adf35ebf468
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

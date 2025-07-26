@@ -19,30 +19,40 @@
         <a href="country.php" style="text-decoration: none">
           <div class="card card-blue">
             <div class="card-title" style="color: inherit">Country</div>
+<<<<<<< HEAD
             <div class="card-value" id='countryCountForDashboard'>0</div>
             <span class="more-info"
+=======
+            <div class="card-value" id='countryCountForDashboard'></div>
+            <span href="country.php" class="more-info"
+>>>>>>> e0420d1fccaa5caf72436bb5387e0adf35ebf468
               >More info <i class="fa fa-arrow-circle-right"></i
             ></span>
           </div>
         </a>
         <div class="card card-orange">
           <div class="card-title">State</div>
-          <div class="card-value">4140</div>
-          <a href="#" class="more-info"
+          <div class="card-value" id="StateCountForDashboard"></div>
+          <a href="state.php" class="more-info"
             >More info <i class="fa fa-arrow-circle-right"></i
           ></a>
         </div>
         <div class="card card-purple">
           <div class="card-title">District</div>
-          <div class="card-value">6208</div>
-          <a href="#" class="more-info"
+          <div class="card-value" id="districtCountForDashboard"></div>
+          <a href="district.php" class="more-info"
             >More info <i class="fa fa-arrow-circle-right"></i
           ></a>
         </div>
          <div class="card card-red">
           <div class="card-title">Stream</div>
+<<<<<<< HEAD
           <div class="card-value" id="streamCountForDashboard">0</div>
           <a href="./stream.php" class="more-info"
+=======
+          <div class="card-value" id="streamCountForDashboard"></div>
+          <a href="#" class="more-info"
+>>>>>>> e0420d1fccaa5caf72436bb5387e0adf35ebf468
             >More info <i class="fa fa-arrow-circle-right"></i
           ></a>
         </div>
@@ -119,6 +129,8 @@
       </div>
       <?php include '../components/footer.php'; ?>
     </div>
+    <script src="../js/script.js"></script>
     <script src="../js/dashboard.js"></script>
+    
   </body>
 </html>
