@@ -19,8 +19,13 @@
         <a href="country.php" style="text-decoration: none">
           <div class="card card-blue">
             <div class="card-title" style="color: inherit">Country</div>
+<<<<<<< HEAD
+            <div class="card-value" id='countryCountForDashboard'>0</div>
+            <span class="more-info"
+=======
             <div class="card-value" id='countryCountForDashboard'></div>
             <span href="country.php" class="more-info"
+>>>>>>> e0420d1fccaa5caf72436bb5387e0adf35ebf468
               >More info <i class="fa fa-arrow-circle-right"></i
             ></span>
           </div>
@@ -39,73 +44,78 @@
             >More info <i class="fa fa-arrow-circle-right"></i
           ></a>
         </div>
-        <div class="card card-red">
+         <div class="card card-red">
           <div class="card-title">Stream</div>
+<<<<<<< HEAD
+          <div class="card-value" id="streamCountForDashboard">0</div>
+          <a href="./stream.php" class="more-info"
+=======
           <div class="card-value" id="streamCountForDashboard"></div>
           <a href="#" class="more-info"
+>>>>>>> e0420d1fccaa5caf72436bb5387e0adf35ebf468
             >More info <i class="fa fa-arrow-circle-right"></i
           ></a>
         </div>
         <div class="card card-green">
           <div class="card-title">Degree Type</div>
-          <div class="card-value">10</div>
-          <a href="#" class="more-info"
+          <div class="card-value" id="degreeCountForDashboard">0</div>
+          <a href="./degree.php" class="more-info"
             >More info <i class="fa fa-arrow-circle-right"></i
           ></a>
         </div>
         <div class="card card-pink">
           <div class="card-title">Course Name</div>
-          <div class="card-value">221</div>
-          <a href="#" class="more-info"
+          <div class="card-value" id="courseCountForDashboard">0</div>
+          <a href="./course.php" class="more-info"
             >More info <i class="fa fa-arrow-circle-right"></i
           ></a>
         </div>
         <div class="card card-grey">
           <div class="card-title">Course Branch</div>
-          <div class="card-value">861</div>
+          <div class="card-value" id="courseBranchCountForDashboard">0</div>
           <a href="#" class="more-info"
             >More info <i class="fa fa-arrow-circle-right"></i
           ></a>
         </div>
         <div class="card card-brown">
           <div class="card-title">Course Duration</div>
-          <div class="card-value">7</div>
-          <a href="#" class="more-info"
+          <div class="card-value" id="courseDurationCountForDashboard">0</div>
+          <a href="./course_duration.php" class="more-info"
             >More info <i class="fa fa-arrow-circle-right"></i
           ></a>
         </div>
         <div class="card card-red">
           <div class="card-title">Affiliation</div>
-          <div class="card-value">7</div>
-          <a href="#" class="more-info"
+          <div class="card-value" id="affiliationCountForDashboard">0</div>
+          <a href="./affilication.php" class="more-info"
             >More info <i class="fa fa-arrow-circle-right"></i
           ></a>
         </div>
         <div class="card card-yellow">
           <div class="card-title">Exam Type</div>
-          <div class="card-value">137</div>
-          <a href="#" class="more-info"
+          <div class="card-value" id="examTypeCountForDashboard">0</div>
+          <a href="./examType.php" class="more-info"
             >More info <i class="fa fa-arrow-circle-right"></i
           ></a>
         </div>
         <div class="card card-mauve">
           <div class="card-title">Ranking</div>
-          <div class="card-value">15</div>
-          <a href="#" class="more-info"
+          <div class="card-value" id="rankingCountForDashboard">0</div>
+          <a href="./ranking.php" class="more-info"
             >More info <i class="fa fa-arrow-circle-right"></i
           ></a>
         </div>
         <div class="card card-cyan">
           <div class="card-title">Ownership</div>
-          <div class="card-value">10</div>
-          <a href="#" class="more-info"
+          <div class="card-value" id="ownershipCountForDashboard">0</div>
+          <a href="./ownership.php" class="more-info"
             >More info <i class="fa fa-arrow-circle-right"></i
           ></a>
         </div>
         <div class="card card-tan">
           <div class="card-title">College Facilities</div>
-          <div class="card-value">35</div>
-          <a href="#" class="more-info"
+          <div class="card-value" id="collegeFacilityCountForDashboard">0</div>
+          <a href="./collegeFacility.php" class="more-info"
             >More info <i class="fa fa-arrow-circle-right"></i
           ></a>
         </div>

@@ -82,6 +82,8 @@
           </table>
         </div>
     
+<<<<<<< HEAD
+=======
       </div>
       <!-- Edit Country Modal -->
       <div id="editCountryModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.3); align-items:center; justify-content:center; z-index:9999;">
@@ -116,6 +118,7 @@
             </div>
           </form>
         </div>
+>>>>>>> e0420d1fccaa5caf72436bb5387e0adf35ebf468
       </div>
       <?php include '../components/footer.php'; ?>
     </div>

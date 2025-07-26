@@ -150,3 +150,67 @@ document.querySelectorAll(".sidebar nav .submenu li a").forEach((link) => {
     }
   });
 });
+
+// Stream count for dashboard
+
+async function streamCountForDashboard() {
+  try {
+    const res = await fetch("http://localhost:4000/api/stream/all");
+    const res2 = await fetch("http://localhost:4000/api/degree/all");
+    const res3 = await fetch(
+      "http://localhost:4000/api/course-duration/all-course-duration"
+    );
+    const res4 = await fetch("http://localhost:4000/api/course/all");
+
+    const res5 = await fetch(
+      "http://localhost:4000/api/affilication/all-affilication"
+    );
+
+    const res6 = await fetch(
+      "http://localhost:4000/api/exam-type/all-exam-type"
+    );
+
+    const res7 = await fetch("http://localhost:4000/api/ranking/all-ranking");
+
+    const res8 = await fetch(
+      "http://localhost:4000/api/ownership/all-ownership"
+    );
+
+    const res9 = await fetch(
+      "http://localhost:4000/api/college-facility/all-college-facility"
+    );
+    const data = await res.json();
+    const data2 = await res2.json();
+    const data3 = await res3.json();
+    const data4 = await res4.json();
+    const data5 = await res5.json();
+    const data6 = await res6.json();
+    const data7 = await res7.json();
+    const data8 = await res8.json();
+    const data9 = await res9.json();
+
+    console.log(data9.length);
+    const streamCountForDashboard = document.getElementById(
+      "streamCountForDashboard"
+    );
+    const degreeCountForDashboard = document.getElementById(
+      "degreeCountForDashboard"
+    );
+
+    const collegeFacilityCountForDashboard = document.getElementById(
+      "collegeFacilityCountForDashboard"
+    );
+    streamCountForDashboard.textContent = data.data.length;
+    degreeCountForDashboard.textContent = data2.degrees.length;
+    courseDurationCountForDashboard.textContent = data3.length;
+    courseCountForDashboard.textContent = data4.courses.length;
+    affiliationCountForDashboard.textContent = data5.length;
+    examTypeCountForDashboard.textContent = data6.length;
+    rankingCountForDashboard.textContent = data7.length;
+    ownershipCountForDashboard.textContent = data8.length;
+    collegeFacilityCountForDashboard.textContent = data9.length;
+  } catch (err) {
+    console.error("Fetch error:", err);
+  }
+}
+streamCountForDashboard();
