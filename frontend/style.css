@@ -1701,8 +1701,8 @@ select {
 
 .main {
   margin-left: 260px;
-  padding: 32px 24px 24px 24px;
-  min-height: 100vh;
+  padding: 32px 24px 100px 24px;
+  min-height: calc(100vh - 60px);
   transition: margin-left 0.3s;
   max-width: 1400px;
   margin-right: auto;
@@ -1730,50 +1730,51 @@ select {
 
 .dashboard-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 20px;
-  max-width: 1200px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  max-width: 1400px;
   margin: 0 auto;
+  padding: 0 16px;
 }
 
 .card {
-  border-radius: 14px;
+  border-radius: 12px;
   color: #fff;
-  padding: 20px 18px 12px 18px;
+  padding: 16px 14px 10px 14px;
   position: relative;
   overflow: hidden;
-  min-height: 90px;
+  min-height: 75px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
 .card .card-title {
-  font-size: 1.08rem;
+  font-size: 0.95rem;
   font-weight: 600;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .card .card-value {
-  font-size: 2rem;
+  font-size: 1.6rem;
   font-weight: bold;
-  margin: 0 0 10px 0;
+  margin: 0 0 8px 0;
 }
 
 .card .more-info {
   background: rgba(0, 0, 0, 0.1);
   color: #fff;
   border: none;
-  border-radius: 6px;
-  padding: 8px 18px;
-  font-size: 1rem;
+  border-radius: 5px;
+  padding: 6px 14px;
+  font-size: 0.9rem;
   cursor: pointer;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
   transition: background 0.2s;
-  margin-top: 8px;
+  margin-top: 6px;
 }
 
 .card .more-info:hover {
@@ -1856,10 +1857,23 @@ select {
 }
 
 .footer {
-  margin-top: 40px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100vw;
+  height: 60px;
+  padding: 20px 16px;
   text-align: center;
   color: #888;
   font-size: 1rem;
+  background: #fff;
+  border-top: 1px solid #e5e7eb;
+  z-index: -1;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .footer a {
@@ -1989,7 +2003,7 @@ select {
 @media (max-width: 900px) {
   .main {
     margin-left: 0;
-    padding: 12px 4vw 12px 4vw;
+    padding: 12px 4vw 100px 4vw;
     max-width: 100vw;
   }
 
@@ -2036,32 +2050,33 @@ select {
   }
 
   .dashboard-cards {
-    grid-template-columns: 1fr;
-    gap: 14px;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
     max-width: 100vw;
+    padding: 0 12px;
   }
 
   .card {
-    padding: 14px 10px 8px 10px;
-    min-height: 60px;
-    border-radius: 10px;
+    padding: 12px 10px 6px 10px;
+    min-height: 55px;
+    border-radius: 8px;
   }
 
   .card .card-title {
-    font-size: 1rem;
-    margin-bottom: 4px;
+    font-size: 0.9rem;
+    margin-bottom: 3px;
   }
 
   .card .card-value {
-    font-size: 1.3rem;
-    margin-bottom: 4px;
+    font-size: 1.2rem;
+    margin-bottom: 3px;
   }
 
   .card .more-info {
-    font-size: 0.98rem;
-    padding: 7px 12px;
-    border-radius: 5px;
-    margin-top: 4px;
+    font-size: 0.85rem;
+    padding: 5px 10px;
+    border-radius: 4px;
+    margin-top: 3px;
   }
 
   .hamburger {
@@ -2071,38 +2086,39 @@ select {
 
 @media (max-width: 600px) {
   .main {
-    padding: 8px 2vw 8px 2vw;
+    padding: 8px 2vw 100px 2vw;
   }
 
   .dashboard-cards {
-    gap: 12px;
+    gap: 10px;
     margin: 0;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   }
 
   .card {
-    padding: 14px 10px 10px 10px;
-    min-height: 70px;
-    border-radius: 12px;
+    padding: 10px 8px 6px 8px;
+    min-height: 50px;
+    border-radius: 8px;
     margin: 0;
   }
 
   .card .card-title {
-    font-size: 1.08rem;
+    font-size: 0.85rem;
     font-weight: 600;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
   }
 
   .card .card-value {
-    font-size: 1.5rem;
+    font-size: 1.1rem;
     font-weight: bold;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
   }
 
   .card .more-info {
-    font-size: 1rem;
-    padding: 7px 12px;
-    border-radius: 6px;
-    margin-top: 6px;
+    font-size: 0.8rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+    margin-top: 4px;
   }
 }
 

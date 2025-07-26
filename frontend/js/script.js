@@ -26,7 +26,8 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const lastActiveSubmenu = localStorage.getItem("lastActiveSubmenu");
-  if (lastActiveSubmenu) {
+  const currentPage = getFileName(window.location.pathname);
+  if (lastActiveSubmenu && currentPage !== "dashboard.php") {
     document.querySelectorAll(".submenu li a").forEach(function (link) {
       if (
         getFileName(link.getAttribute("href")) ===
@@ -39,25 +40,11 @@ document.addEventListener("DOMContentLoaded", function () {
         var parentSubmenu = link.closest(".submenu");
         if (parentSubmenu) {
           parentSubmenu.classList.add("open");
-          parentSubmenu.style.maxHeight = "1000px"; // force open
-          parentSubmenu.style.opacity = "1";
-          parentSubmenu.style.transform = "translateY(0)";
           var chevron =
             parentSubmenu.parentElement.querySelector(".fa-chevron-down");
           if (chevron) {
             chevron.style.transform = "rotate(180deg)";
           }
-        }
-        // Force sidebar open (for mobile)
-        var sidebar = document.querySelector(".sidebar");
-        if (sidebar) {
-          sidebar.classList.add("open");
-        }
-        // Remove overlay if present (for mobile)
-        var overlay = document.querySelector(".sidebar-overlay");
-        if (overlay) {
-          overlay.classList.remove("hide");
-          overlay.style.display = "none";
         }
       }
     });
@@ -142,148 +129,5 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Sidebar dropdown toggle functions for sidebar.php
-  window.toggleLocationDirectory = function () {
-    var dropdown = document.getElementById("locationDirectoryDropdown");
-    var chevron = document.getElementById("locationChevron");
-    if (!dropdown.classList.contains("open")) {
-      dropdown.classList.add("open");
-      chevron.style.transform = "rotate(180deg)";
-      chevron.style.transition = "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
-    } else {
-      dropdown.classList.remove("open");
-      chevron.style.transform = "rotate(0deg)";
-      chevron.style.transition = "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
-      // Close all submenus inside this dropdown
-      dropdown.querySelectorAll(".submenu").forEach(function (sub) {
-        sub.classList.remove("open");
-      });
-    }
-  };
-  window.toggleMasterData = function (event) {
-    if (event) event.stopPropagation();
-    var dropdown = document.getElementById("masterDataDropdown");
-    var chevron = document.getElementById("masterChevron");
-    if (!dropdown.classList.contains("open")) {
-      dropdown.classList.add("open");
-      chevron.style.transform = "rotate(180deg)";
-      chevron.style.transition = "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
-    } else {
-      dropdown.classList.remove("open");
-      chevron.style.transform = "rotate(0deg)";
-      chevron.style.transition = "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
-      dropdown.querySelectorAll(".submenu").forEach(function (sub) {
-        sub.classList.remove("open");
-      });
-    }
-  };
-  window.toggleCollegeMaster = function () {
-    var dropdown = document.getElementById("collegeMasterDropdown");
-    var chevron = document.getElementById("collegeChevron");
-    if (!dropdown.classList.contains("open")) {
-      dropdown.classList.add("open");
-      chevron.style.transform = "rotate(180deg)";
-      chevron.style.transition = "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
-    } else {
-      dropdown.classList.remove("open");
-      chevron.style.transform = "rotate(0deg)";
-      chevron.style.transition = "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
-      dropdown.querySelectorAll(".submenu").forEach(function (sub) {
-        sub.classList.remove("open");
-      });
-    }
-  };
-  window.toggleExamMaster = function () {
-    var dropdown = document.getElementById("examMasterDropdown");
-    var chevron = document.getElementById("examChevron");
-    if (!dropdown.classList.contains("open")) {
-      dropdown.classList.add("open");
-      chevron.style.transform = "rotate(180deg)";
-      chevron.style.transition = "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
-    } else {
-      dropdown.classList.remove("open");
-      chevron.style.transform = "rotate(0deg)";
-      chevron.style.transition = "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
-      dropdown.querySelectorAll(".submenu").forEach(function (sub) {
-        sub.classList.remove("open");
-      });
-    }
-  };
-  window.toggleAdvMaster = function () {
-    var dropdown = document.getElementById("advMasterDropdown");
-    var chevron = document.getElementById("advChevron");
-    if (!dropdown.classList.contains("open")) {
-      dropdown.classList.add("open");
-      chevron.style.transform = "rotate(180deg)";
-      chevron.style.transition = "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
-    } else {
-      dropdown.classList.remove("open");
-      chevron.style.transform = "rotate(0deg)";
-      chevron.style.transition = "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
-      dropdown.querySelectorAll(".submenu").forEach(function (sub) {
-        sub.classList.remove("open");
-      });
-    }
-  };
-  window.toggleEnquiryData = function () {
-    var dropdown = document.getElementById("enquiryDataDropdown");
-    var chevron = document.getElementById("enquiryChevron");
-    if (!dropdown.classList.contains("open")) {
-      dropdown.classList.add("open");
-      chevron.style.transform = "rotate(180deg)";
-      chevron.style.transition = "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
-    } else {
-      dropdown.classList.remove("open");
-      chevron.style.transform = "rotate(0deg)";
-      chevron.style.transition = "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
-      dropdown.querySelectorAll(".submenu").forEach(function (sub) {
-        sub.classList.remove("open");
-      });
-    }
-  };
-  window.toggleExtraPages = function () {
-    var dropdown = document.getElementById("extraPagesDropdown");
-    var chevron = document.getElementById("extraPagesChevron");
-    if (!dropdown.classList.contains("open")) {
-      dropdown.classList.add("open");
-      chevron.style.transform = "rotate(180deg)";
-      chevron.style.transition = "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
-    } else {
-      dropdown.classList.remove("open");
-      chevron.style.transform = "rotate(0deg)";
-      chevron.style.transition = "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
-      dropdown.querySelectorAll(".submenu").forEach(function (sub) {
-        sub.classList.remove("open");
-      });
-    }
-  };
-  window.keepSubmenuOpen = function (dropdownId, chevronId) {
-    var dropdown = document.getElementById(dropdownId);
-    var chevron = document.getElementById(chevronId);
-    if (dropdown && !dropdown.classList.contains("open")) {
-      dropdown.classList.add("open");
-      if (chevron) {
-        chevron.style.transform = "rotate(180deg)";
-        chevron.style.transition =
-          "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
-      }
-    }
-  };
-
-  if (
-    window.location.pathname.includes("country.php") ||
-    window.location.pathname.includes("state.php") ||
-    window.location.pathname.includes("district.php")
-  ) {
-    const locationDropdown = document.getElementById(
-      "locationDirectoryDropdown"
-    );
-    const locationChevron = document.getElementById("locationChevron");
-    if (locationDropdown && !locationDropdown.classList.contains("open")) {
-      locationDropdown.classList.add("open");
-      if (locationChevron) {
-        locationChevron.style.transform = "rotate(180deg)";
-      }
-    }
-  }
+  // Remove all code related to .submenu, .open, menu-btn, and sidebar toggling to avoid conflicts with common.js
 });

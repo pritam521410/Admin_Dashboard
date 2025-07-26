@@ -1,4 +1,6 @@
 // === Sidebar Submenu Toggle ===
+if (typeof initSidebar === "function") initSidebar();
+
 function toggleSubmenu(dropdownId, chevronId) {
   const dropdown = document.getElementById(dropdownId);
   const chevron = document.getElementById(chevronId);
@@ -61,10 +63,7 @@ sidebarOverlay?.addEventListener("click", closeSidebar);
 // === Fetch Dashboard Counts ===
 async function countForDashboard() {
   try {
-    const res = await fetch("http://localhost:4000/api/get-counts");
-    if (!res.ok) throw new Error(`API error: ${res.statusText}`);
-
-    const data = await res.json();
+    const data = await apiRequest("http://localhost:4000/api/get-counts");
     document.getElementById("countryCountForDashboard").textContent =
       data.data?.countryCount ?? "-";
     document.getElementById("StateCountForDashboard").textContent =
@@ -87,20 +86,28 @@ async function countForDashboard() {
 // === Stream & Degree Count ===
 async function streamCountForDashboard() {
   try {
-    const [streamRes, degreeRes] = await Promise.all([
-      fetch("http://localhost:4000/api/stream/all"),
-      fetch("http://localhost:4000/api/degree/all"),
+    const [streamData, degreeData] = await Promise.all([
+      apiRequest("http://localhost:4000/api/stream/all").catch((err) => {
+        if (err.message === "Not Found") return { data: [] };
+        throw err;
+      }),
+      apiRequest("http://localhost:4000/api/degree/all").catch((err) => {
+        if (err.message === "Not Found") return { degrees: [] };
+        throw err;
+      }),
     ]);
-
-    const streamData = await streamRes.json();
-    const degreeData = await degreeRes.json();
 
     document.getElementById("streamCountForDashboard").textContent =
       streamData.data?.length ?? "-";
     document.getElementById("degreeCountForDashboard").textContent =
       degreeData.degrees?.length ?? "-";
   } catch (err) {
-    console.error("Stream/Degree fetch failed:", err);
+    // Only log if not a 404 error
+    if (err.message !== "Not Found") {
+      console.error("Stream/Degree fetch failed:", err);
+    }
+    document.getElementById("streamCountForDashboard").textContent = "-";
+    document.getElementById("degreeCountForDashboard").textContent = "-";
   }
 }
 
@@ -126,8 +133,6 @@ document.addEventListener("fullscreenchange", () => {
 
 // === Init on DOMContentLoaded ===
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("Dashboard initialized successfully");
-
   // Auto-expand Location Directory submenu on specific page
   if (window.location.pathname.includes("country.php")) {
     keepSubmenuOpen("locationDirectoryDropdown", "locationChevron");

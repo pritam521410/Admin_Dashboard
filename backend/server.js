@@ -8,6 +8,9 @@ import countryRoutes from "./Route/country.routes.js";
 import commonRoutes from "./Route/common.routes.js";
 import stateRoutes from "./Route/state.routes.js";
 import districtRoutes from "./Route/district.routes.js";
+import examLevelRoutes from "./Route/examlevel.routes.js";
+import examRoutes from "./Route/exam.routes.js";
+import collegeRoutes from "./Route/college.routes.js";
 
 const app = express();
 dotenv.config();
@@ -44,6 +47,9 @@ app.use("/api/country", countryRoutes);
 app.use("/api/", commonRoutes);
 app.use("/api/state", stateRoutes);
 app.use("/api/district", districtRoutes);
+app.use("/api/examlevel", examLevelRoutes);
+app.use("/api/exam", examRoutes);
+app.use("/api/college", collegeRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

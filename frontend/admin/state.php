@@ -11,7 +11,12 @@
   <?php include '../components/header.php'; ?>
   <?php include '../components/sidebar.php'; ?>
       <div class="main page-transition">
-      <?php include '../components/state-header.php'; ?>
+        <?php
+        $pageTitle = 'State Management';
+        $breadcrumb = ['Home', 'Location Directory', 'State'];
+        include '../components/breadcum.php';
+        ?>
+     
     <!-- Country management content (form/list) -->
     <div class="main-container" style="max-width: 900px; margin: 0 auto;">
       <div class="top-btns" style="display: flex; gap: 12px; margin-bottom: 24px;">
@@ -128,6 +133,7 @@
     </div>
     <script src="../js/script.js"></script>
     <script src="../js/dashboard.js"></script>
+    <script src="../js/common.js"></script>
     <script src="../js/state.js"></script>
   </body>
 </html>

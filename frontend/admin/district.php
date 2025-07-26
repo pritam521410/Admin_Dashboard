@@ -11,7 +11,13 @@
   <?php include '../components/header.php'; ?>
   <?php include '../components/sidebar.php'; ?>
       <div class="main page-transition">
-      <?php include '../components/district-header.php'; ?>
+        <?php
+        $pageTitle = 'District Management';
+        $breadcrumb = ['Home', 'Location Directory', 'District'];
+        include '../components/breadcum.php';
+        ?>
+
+     
     <!-- Country management content (form/list) -->
     <div class="main-container" style="max-width: 900px; margin: 0 auto;">
       <div class="top-btns" style="display: flex; gap: 12px; margin-bottom: 24px;">
@@ -106,23 +112,7 @@
 
 <!-- JS Scripts -->
 <script src="../js/script.js"></script>
+<script src="../js/common.js"></script>
 <script src="../js/district.js"></script>
-<script>
-// Show/hide form and list on button clicks
-const showFormBtn = document.getElementById('showFormBtn');
-const showListBtn = document.getElementById('showListBtn');
-const formDiv = document.getElementById('districtFormDiv');
-const listDiv = document.getElementById('districtListDiv');
-if (showFormBtn && showListBtn && formDiv && listDiv) {
-  showFormBtn.addEventListener('click', function () {
-    formDiv.style.display = 'block';
-    listDiv.style.display = 'none';
-  });
-  showListBtn.addEventListener('click', function () {
-    formDiv.style.display = 'none';
-    listDiv.style.display = 'block';
-  });
-}
-</script>
 </body>
 </html>
