@@ -19,13 +19,8 @@
         <a href="country.php" style="text-decoration: none">
           <div class="card card-blue">
             <div class="card-title" style="color: inherit">Country</div>
-<<<<<<< HEAD
             <div class="card-value" id='countryCountForDashboard'>0</div>
             <span class="more-info"
-=======
-            <div class="card-value" id='countryCountForDashboard'></div>
-            <span href="country.php" class="more-info"
->>>>>>> e0420d1fccaa5caf72436bb5387e0adf35ebf468
               >More info <i class="fa fa-arrow-circle-right"></i
             ></span>
           </div>
@@ -46,13 +41,8 @@
         </div>
          <div class="card card-red">
           <div class="card-title">Stream</div>
-<<<<<<< HEAD
           <div class="card-value" id="streamCountForDashboard">0</div>
           <a href="./stream.php" class="more-info"
-=======
-          <div class="card-value" id="streamCountForDashboard"></div>
-          <a href="#" class="more-info"
->>>>>>> e0420d1fccaa5caf72436bb5387e0adf35ebf468
             >More info <i class="fa fa-arrow-circle-right"></i
           ></a>
         </div>
@@ -70,13 +60,7 @@
             >More info <i class="fa fa-arrow-circle-right"></i
           ></a>
         </div>
-        <div class="card card-grey">
-          <div class="card-title">Course Branch</div>
-          <div class="card-value" id="courseBranchCountForDashboard">0</div>
-          <a href="#" class="more-info"
-            >More info <i class="fa fa-arrow-circle-right"></i
-          ></a>
-        </div>
+        
         <div class="card card-brown">
           <div class="card-title">Course Duration</div>
           <div class="card-value" id="courseDurationCountForDashboard">0</div>

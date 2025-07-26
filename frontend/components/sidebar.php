@@ -21,12 +21,11 @@ $sidebarMenu = [
   [
     'label' => 'Master Data',
     'icon' => 'fa-database',
-    'pages' => ['stream', 'degreetype', 'coursename', 'subcoursebranch', 'courseduration', 'affiliationname', 'approvedthrough', 'examthrough', 'ranking', 'ownership', 'college-facilities'],
+    'pages' => ['stream', 'degreetype', 'coursename', 'courseduration', 'affiliationname', 'approvedthrough', 'examthrough', 'ranking', 'ownership', 'college-facilities'],
     'children' => [
       ['label' => 'Stream', 'href' => 'stream.php'],
       ['label' => 'Degree Type', 'href' => 'degree.php'],
       ['label' => 'Course Name', 'href' => 'course.php'],
-      ['label' => 'Sub-Course Branch', 'href' => 'subcoursebranch.html'],
       ['label' => 'Course Duration', 'href' => 'course_duration.php'],
       ['label' => 'Affiliation Name', 'href' => 'affilication.php'],
       ['label' => 'Approved Through', 'href' => 'approvedThrough.php'],
