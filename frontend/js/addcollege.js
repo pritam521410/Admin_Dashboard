@@ -42,14 +42,20 @@ document.addEventListener("DOMContentLoaded", function () {
   if (formDiv) formDiv.style.display = "none";
   if (listDiv) listDiv.style.display = "block";
 
-  // Show/hide logic for form and list
+  // Show/hide logic for form and list with button toggle
   function showForm() {
     if (formDiv) formDiv.style.display = "block";
     if (listDiv) listDiv.style.display = "none";
+    // Hide Add Record button, show Record List button
+    if (showFormBtn) showFormBtn.style.display = "none";
+    if (showListBtn) showListBtn.style.display = "inline-block";
   }
   function showList() {
     if (formDiv) formDiv.style.display = "none";
     if (listDiv) listDiv.style.display = "block";
+    // Hide Record List button, show Add Record button
+    if (showListBtn) showListBtn.style.display = "none";
+    if (showFormBtn) showFormBtn.style.display = "inline-block";
   }
   if (showFormBtn) showFormBtn.addEventListener("click", showForm);
   if (showListBtn) showListBtn.addEventListener("click", showList);

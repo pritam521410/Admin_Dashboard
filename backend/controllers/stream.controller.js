@@ -48,6 +48,7 @@ export const getAllStreams = async (req, res) => {
     const streams = await Stream.find();
     res.json({ success: true, data: streams });
   } catch (error) {
+    console.error("Error getting streams:", error);
     res.status(500).json({
       success: false,
       message: "Failed to fetch streams",
