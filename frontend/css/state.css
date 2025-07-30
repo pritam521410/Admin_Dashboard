@@ -5,11 +5,18 @@
   margin-left: 20px;
 }
 
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
 .page-title {
   margin-top: 0;
   color: #2563eb;
   font-size: 1.8rem;
-  margin-bottom: 24px;
+  margin-bottom: 0;
 }
 
 .state-container {
@@ -148,7 +155,7 @@
 }
 
 .state-table td {
-  padding: 14px 12px;
+  padding: 8px 12px;
   border-bottom: 1px solid #e2e8f0;
   transition: background-color 0.2s;
   font-size: 0.9rem;
@@ -330,7 +337,7 @@
 .top-btns {
   display: flex;
   gap: 12px;
-  margin-bottom: 24px;
+  margin-bottom: 0;
 }
 
 .main-btn {
@@ -462,6 +469,12 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
   .form-row {
     flex-direction: column;
   }

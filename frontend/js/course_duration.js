@@ -1,152 +1,332 @@
 // Course Duration Management JavaScript
 
 document.addEventListener("DOMContentLoaded", function () {
-  const form = document.querySelector(".degree-form");
-  const input = document.getElementById("courseDuration");
-  const submitBtn = document.getElementById("courseDurationSubmit");
-  const updateBtn = document.getElementById("courseDurationUpdate");
-  const backBtn = document.getElementById("courseDurationBack");
-  const tableBody = document.querySelector(".degree-table tbody");
+  // Initialize sidebar
+  initSidebar();
 
-  let editingId = null;
+  // Base URL for API
+  const baseUrl = "http://localhost:4000/api";
 
-  // Fetch and render all course durations
-  async function fetchDurations() {
-    tableBody.innerHTML = "";
-    try {
-      const res = await fetch(
-        "http://localhost:4000/api/course-duration/all-course-duration"
-      );
-      const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) {
-        data.forEach((item, idx) => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${idx + 1}</td>
-            <td>${item.courseDuration}</td>
-            <td>
-              <button class="edit-btn" style="background:#2563eb;color:#fff;border:none;border-radius:6px;padding:6px 12px;cursor:pointer;margin-right:6px;" data-id="${
-                item._id
-              }"><i class="fa fa-edit"></i></button>
-              <button class="delete-btn" style="background:#e53935;color:#fff;border:none;border-radius:6px;padding:6px 12px;cursor:pointer;" data-id="${
-                item._id
-              }"><i class="fa fa-trash"></i></button>
-            </td>
-          `;
-          tableBody.appendChild(tr);
+  // DOM elements
+  const courseDurationForm = document.getElementById("courseDurationForm");
+  const formDiv = document.getElementById("formDiv");
+  const listDiv = document.getElementById("listDiv");
+  const courseDurationTable = document.getElementById("courseDurationTable");
+  const showFormBtn = document.getElementById("showFormBtn");
+  const showListBtn = document.getElementById("showListBtn");
+
+  // Data storage
+  let allCourseDurations = [];
+  let pagination = null;
+
+  // Custom render function for course durations (for pagination)
+  function renderCourseDurationTable(data, startIndex) {
+    if (!courseDurationTable) return;
+
+    courseDurationTable.innerHTML = data
+      .map(
+        (duration, i) => `
+      <tr>
+        <td>${startIndex + i + 1}</td>
+        <td>${duration.courseDuration || ""}</td>
+        <td class="action-buttons">
+          <button class="edit-state-btn" data-id="${
+            duration._id
+          }"><i class="fa fa-edit"></i></button>
+          <button class="delete-state-btn" data-id="${
+            duration._id
+          }"><i class="fa fa-trash"></i></button>
+        </td>
+      </tr>
+    `
+      )
+      .join("");
+
+    // Add event listeners for edit and delete buttons
+    addEventListeners();
+  }
+
+  // Add event listeners for edit and delete buttons (separate function)
+  function addEventListeners() {
+    // Use event delegation for better reliability
+    if (courseDurationTable) {
+      // Remove existing listener to prevent duplicates
+      courseDurationTable.removeEventListener("click", handleTableClick);
+      courseDurationTable.addEventListener("click", handleTableClick);
+
+      // Also add direct event listeners to buttons for better compatibility
+      const editButtons =
+        courseDurationTable.querySelectorAll(".edit-state-btn");
+      const deleteButtons =
+        courseDurationTable.querySelectorAll(".delete-state-btn");
+
+      editButtons.forEach((btn) => {
+        btn.addEventListener("click", function (e) {
+          e.stopPropagation();
+          const id = this.getAttribute("data-id");
+          const duration = allCourseDurations.find((d) => d._id === id);
+          if (duration) openEditCourseDurationModal(duration);
         });
-      } else {
-        tableBody.innerHTML = `<tr><td colspan='3'>No records found.</td></tr>`;
-      }
-    } catch (err) {
-      tableBody.innerHTML = `<tr><td colspan='3'>Failed to load records.</td></tr>`;
+      });
+
+      deleteButtons.forEach((btn) => {
+        btn.addEventListener("click", function (e) {
+          e.stopPropagation();
+          const id = this.getAttribute("data-id");
+          if (
+            confirm("Are you sure you want to delete this course duration?")
+          ) {
+            deleteCourseDuration(id);
+          }
+        });
+      });
     }
   }
 
-  function resetForm() {
-    editingId = null;
-    input.value = "";
-    submitBtn.style.display = "inline-block";
-    updateBtn.style.display = "none";
-    backBtn.style.display = "none";
+  // Event handler function using event delegation
+  function handleTableClick(event) {
+    const target = event.target;
+
+    // Handle edit button clicks
+    if (target.closest(".edit-state-btn")) {
+      const btn = target.closest(".edit-state-btn");
+      const id = btn.getAttribute("data-id");
+      const duration = allCourseDurations.find((d) => d._id === id);
+      if (duration) openEditCourseDurationModal(duration);
+    }
+
+    // Handle delete button clicks
+    if (target.closest(".delete-state-btn")) {
+      const btn = target.closest(".delete-state-btn");
+      const id = btn.getAttribute("data-id");
+      if (confirm("Are you sure you want to delete this course duration?")) {
+        deleteCourseDuration(id);
+      }
+    }
   }
 
-  // Add new course duration
-  form.addEventListener("submit", async function (e) {
-    e.preventDefault();
-    if (editingId) return; // Prevent submit if editing
-    const value = input.value.trim();
-    if (!value) return alert("Please enter a course duration.");
+  // Fetch all course durations
+  async function fetchCourseDurations() {
     try {
-      const res = await fetch(
-        "http://localhost:4000/api/course-duration/add-course-duration",
+      allCourseDurations = await apiRequest(
+        `${baseUrl}/course-duration/all-course-duration`
+      );
+      initPaginationForCourseDurations(); // Changed from renderCourseDurationTable(allCourseDurations)
+    } catch (err) {
+      courseDurationTable.innerHTML =
+        '<tr><td colspan="3" style="text-align:center; color:#ef4444;">Failed to load data</td></tr>';
+    }
+  }
+
+  // Initialize pagination for course durations
+  function initPaginationForCourseDurations() {
+    // Create pagination container if it doesn't exist
+    let paginationContainer = document.getElementById("pagination-container");
+    if (!paginationContainer) {
+      paginationContainer = document.createElement("div");
+      paginationContainer.id = "pagination-container";
+      paginationContainer.className = "pagination-wrapper";
+      // Insert after the table container
+      const tableContainer = courseDurationTable.closest(".table-container");
+      if (tableContainer) {
+        tableContainer.parentNode.insertBefore(
+          paginationContainer,
+          tableContainer.nextSibling
+        );
+      } else {
+        courseDurationTable.parentNode.appendChild(paginationContainer);
+      }
+    }
+
+    // Initialize pagination
+    pagination = initPagination({
+      container: courseDurationTable,
+      data: allCourseDurations,
+      itemsPerPage: 10,
+      renderFunction: renderCourseDurationTable,
+      onPageChange: (currentData, currentPage) => {
+        // Re-add event listeners after page change
+        setTimeout(() => {
+          addEventListeners();
+        }, 100);
+      },
+    });
+  }
+
+  // Button toggle functionality
+  if (showFormBtn && showListBtn && formDiv && listDiv) {
+    showFormBtn.addEventListener("click", function () {
+      formDiv.style.display = "block";
+      listDiv.style.display = "none";
+      // Show both buttons
+      showFormBtn.style.display = "inline-block";
+      showListBtn.style.display = "inline-block";
+    });
+    showListBtn.addEventListener("click", function () {
+      formDiv.style.display = "none";
+      listDiv.style.display = "block";
+      // Show both buttons
+      showFormBtn.style.display = "inline-block";
+      showListBtn.style.display = "inline-block";
+    });
+  }
+
+  // Add course duration using common form handler
+  handleForm(courseDurationForm, async (formData) => {
+    try {
+      const courseDurationData = {
+        courseDuration: formData.get("courseDuration"),
+      };
+
+      const response = await fetch(
+        `${baseUrl}/course-duration/add-course-duration`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ courseDuration: value }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(courseDurationData),
         }
       );
-      if (res.ok) {
-        input.value = "";
-        fetchDurations();
-      } else {
-        alert("Failed to add course duration.");
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to add course duration");
       }
-    } catch {
-      alert("Error adding course duration.");
+
+      const result = await response.json();
+      console.log("Course duration added:", result);
+      alert("Course duration added successfully!");
+      courseDurationForm.reset();
+      formDiv.style.display = "none";
+      listDiv.style.display = "block";
+      // Show both buttons
+      showFormBtn.style.display = "inline-block";
+      showListBtn.style.display = "inline-block";
+
+      // Force refresh the data
+      console.log("Refreshing course durations after adding...");
+      await fetchCourseDurations();
+      console.log(
+        "Course durations refreshed, current data:",
+        allCourseDurations
+      );
+    } catch (error) {
+      console.error("Error adding course duration:", error);
+      alert("Failed to submit course duration: " + error.message);
     }
   });
 
-  // Update course duration
-  updateBtn.addEventListener("click", async function () {
-    const value = input.value.trim();
-    if (!editingId || !value) return;
+  // Delete course duration using common API utility
+  async function deleteCourseDuration(id) {
     try {
-      const res = await fetch(
-        `http://localhost:4000/api/course-duration/update-course-duration/${editingId}`,
+      const response = await fetch(
+        `${baseUrl}/course-duration/delete-course-duration/${id}`,
         {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ courseDuration: value }),
+          method: "DELETE",
         }
       );
-      if (res.ok) {
-        resetForm();
-        fetchDurations();
-      } else {
-        alert("Failed to update course duration.");
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.message || "Failed to delete course duration"
+        );
       }
-    } catch {
-      alert("Error updating course duration.");
+
+      alert("Course duration deleted successfully!");
+      fetchCourseDurations();
+    } catch (error) {
+      console.error("Error deleting course duration:", error);
+      alert("Failed to delete course duration: " + error.message);
+    }
+  }
+
+  // Edit modal logic
+  const editCourseDurationModal = document.getElementById(
+    "editCourseDurationModal"
+  );
+  const closeEditCourseDurationModalBtn = document.getElementById(
+    "closeEditCourseDurationModal"
+  );
+  const cancelEditCourseDurationBtn = document.getElementById(
+    "cancelEditCourseDurationBtn"
+  );
+
+  function openEditCourseDurationModal(duration) {
+    document.getElementById("editCourseDurationId").value = duration._id;
+    document.getElementById("editCourseDurationName").value =
+      duration.courseDuration;
+
+    editCourseDurationModal.style.display = "flex";
+  }
+
+  function closeEditCourseDurationModal() {
+    editCourseDurationModal.style.display = "none";
+    document.getElementById("editCourseDurationForm").reset();
+  }
+
+  // Close modal when clicking on X or Cancel
+  if (closeEditCourseDurationModalBtn) {
+    closeEditCourseDurationModalBtn.addEventListener(
+      "click",
+      closeEditCourseDurationModal
+    );
+  }
+  if (cancelEditCourseDurationBtn) {
+    cancelEditCourseDurationBtn.addEventListener(
+      "click",
+      closeEditCourseDurationModal
+    );
+  }
+
+  // Close modal when clicking outside
+  window.addEventListener("click", function (event) {
+    if (event.target === editCourseDurationModal) {
+      closeEditCourseDurationModal();
     }
   });
 
-  // Back button logic
-  backBtn.addEventListener("click", function () {
-    resetForm();
-    fetchDurations();
-  });
+  // Handle edit form submission
+  handleForm(
+    document.getElementById("editCourseDurationForm"),
+    async (formData) => {
+      try {
+        const id = formData.get("id");
+        const courseDurationData = {
+          courseDuration: formData.get("courseDuration"),
+        };
 
-  // Delegate edit and delete button events
-  tableBody.addEventListener("click", async function (e) {
-    const editBtn = e.target.closest(".edit-btn");
-    const deleteBtn = e.target.closest(".delete-btn");
-    if (editBtn) {
-      const id = editBtn.getAttribute("data-id");
-      // Find the row and set input for editing
-      const row = editBtn.closest("tr");
-      const duration = row.children[1].textContent;
-      input.value = duration;
-      editingId = id;
-      submitBtn.style.display = "none";
-      updateBtn.style.display = "inline-block";
-      backBtn.style.display = "inline-block";
-    } else if (deleteBtn) {
-      const id = deleteBtn.getAttribute("data-id");
-      if (confirm("Are you sure you want to delete this course duration?")) {
-        try {
-          const res = await fetch(
-            `http://localhost:4000/api/course-duration/delete-course-duration/${id}`,
-            {
-              method: "DELETE",
-            }
-          );
-          if (res.ok) {
-            fetchDurations();
-            if (editingId === id) {
-              resetForm();
-            }
-          } else {
-            alert("Failed to delete course duration.");
+        const response = await fetch(
+          `${baseUrl}/course-duration/update-course-duration/${id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(courseDurationData),
           }
-        } catch {
-          alert("Error deleting course duration.");
+        );
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(
+            errorData.message || "Failed to update course duration"
+          );
         }
+
+        const result = await response.json();
+        console.log("Course duration updated:", result);
+        alert("Course duration updated successfully!");
+        closeEditCourseDurationModal();
+        fetchCourseDurations();
+      } catch (error) {
+        console.error("Error updating course duration:", error);
+        alert("Failed to update course duration: " + error.message);
       }
     }
-  });
+  );
 
   // Initial fetch
-  fetchDurations();
-  resetForm();
+  fetchCourseDurations();
 });

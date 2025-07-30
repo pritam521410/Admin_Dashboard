@@ -20,15 +20,6 @@
      
     <!-- District management content (form/list) -->
     <div class="main-container">
-      <div class="top-btns">
-        <button id="showFormBtn" class="main-btn">
-          <span>➕</span> Add Record
-        </button>
-        <button id="showListBtn" class="main-btn success">
-          <span>📋</span> Record List
-        </button>
-      </div>
-
       <!-- District Form -->
       <div class="state-container" id="formDiv" style="display: none;">
         <h2 class="page-title">Add District</h2>
@@ -54,7 +45,17 @@
 
       <!-- District List -->
       <div class="state-container" id="listDiv" style="display: block;">
-        <h2 class="page-title">District List</h2>
+        <div class="page-header">
+          <h2 class="page-title">District List</h2>
+          <div class="top-btns">
+            <button id="showFormBtn" class="main-btn">
+              <span>➕</span> Add Record
+            </button>
+            <button id="showListBtn" class="main-btn success">
+              <span>📋</span> Record List
+            </button>
+          </div>
+        </div>
         <div class="table-container">
           <table class="state-table">
             <thead>

@@ -20,15 +20,6 @@
      
     <!-- State management content (form/list) -->
     <div class="main-container">
-      <div class="top-btns">
-        <button id="showFormBtn" class="main-btn">
-          <span>➕</span> Add Record
-        </button>
-        <button id="showListBtn" class="main-btn success">
-          <span>📋</span> Record List
-        </button>
-      </div>
-
       <!-- State Form -->
       <div class="state-container" id="formDiv" style="display: none;">
         <h2 class="page-title">Add State</h2>
@@ -66,7 +57,17 @@
 
       <!-- State List -->
       <div class="state-container" id="listDiv" style="display: block;">
-        <h2 class="page-title">State List</h2>
+        <div class="page-header">
+          <h2 class="page-title">State List</h2>
+          <div class="top-btns">
+            <button id="showFormBtn" class="main-btn">
+              <span>➕</span> Add Record
+            </button>
+            <button id="showListBtn" class="main-btn success">
+              <span>📋</span> Record List
+            </button>
+          </div>
+        </div>
         <div class="table-container">
           <table class="state-table">
             <thead>

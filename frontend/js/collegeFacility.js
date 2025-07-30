@@ -1,163 +1,270 @@
-// College Facility Management JavaScript
-
 document.addEventListener("DOMContentLoaded", function () {
-  const form = document.querySelector(".degree-form");
-  const nameInput = document.getElementById("facilityName");
-  const logoInput = document.getElementById("facilityLogo");
-  const submitBtn = document.getElementById("facilitySubmit");
-  const updateBtn = document.getElementById("facilityUpdate");
-  const backBtn = document.getElementById("facilityBack");
-  const tableBody = document.querySelector(".degree-table tbody");
+  const baseUrl = window.baseUrl || "http://localhost:4000/api";
+  if (typeof initSidebar === "function") initSidebar();
 
-  let editingId = null;
+  const collegeFacilityForm = document.getElementById("collegeFacilityForm");
+  const formDiv = document.getElementById("formDiv");
+  const listDiv = document.getElementById("listDiv");
+  const collegeFacilityTable = document.getElementById("collegeFacilityTable");
+  let allCollegeFacilities = [];
+  let pagination = null; // Added for pagination
 
-  // Fetch and render all facilities
-  async function fetchFacilities() {
-    tableBody.innerHTML = "";
-    try {
-      const res = await fetch(
-        "http://localhost:4000/api/college-facility/all-college-facility"
-      );
-      const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) {
-        data.forEach((item, idx) => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${idx + 1}</td>
-            <td>${item.name}</td>
-            <td>${
-              item.logo
-                ? `<img src='http://localhost:4000/${item.logo}' style='height:48px;max-width:64px;object-fit:contain;' />`
-                : ""
-            }</td>
-            <td>
-              <button class="edit-btn" style="background:#2563eb;color:#fff;border:none;border-radius:6px;padding:6px 12px;cursor:pointer;margin-right:6px;" data-id="${
-                item._id
-              }"><i class="fa fa-edit"></i></button>
-              <button class="delete-btn" style="background:#e53935;color:#fff;border:none;border-radius:6px;padding:6px 12px;cursor:pointer;" data-id="${
-                item._id
-              }"><i class="fa fa-trash"></i></button>
-            </td>
-          `;
-          tableBody.appendChild(tr);
+  // Custom render function for college facilities (for pagination)
+  function renderCollegeFacilityTable(data, startIndex) {
+    if (!collegeFacilityTable) return;
+
+    collegeFacilityTable.innerHTML = data
+      .map(
+        (f, i) => `
+      <tr>
+        <td>${startIndex + i + 1}</td>
+        <td>${f.name || ""}</td>
+        <td class="image-cell">
+          ${
+            f.logo
+              ? `<img src="http://localhost:4000/${f.logo}" alt="facility logo" class="facility-logo" style="width: 50px; height: 50px; object-fit: cover;" />`
+              : "<span class='no-image'>N/A</span>"
+          }
+        </td>
+        <td class="action-buttons">
+          <button class="edit-state-btn" data-id="${
+            f._id
+          }"><i class="fa fa-edit"></i></button>
+          <button class="delete-state-btn" data-id="${
+            f._id
+          }"><i class="fa fa-trash"></i></button>
+        </td>
+      </tr>
+    `
+      )
+      .join("");
+
+    // Add event listeners for edit and delete buttons
+    addEventListeners();
+  }
+
+  // Add event listeners for edit and delete buttons (separate function)
+  function addEventListeners() {
+    // Use event delegation for better reliability
+    if (collegeFacilityTable) {
+      // Remove existing listener to prevent duplicates
+      collegeFacilityTable.removeEventListener("click", handleTableClick);
+      collegeFacilityTable.addEventListener("click", handleTableClick);
+
+      // Also add direct event listeners to buttons for better compatibility
+      const editButtons =
+        collegeFacilityTable.querySelectorAll(".edit-state-btn");
+      const deleteButtons =
+        collegeFacilityTable.querySelectorAll(".delete-state-btn");
+
+      editButtons.forEach((btn) => {
+        btn.addEventListener("click", function (e) {
+          e.stopPropagation();
+          const id = this.getAttribute("data-id");
+          const facility = allCollegeFacilities.find((f) => f._id === id);
+          if (facility) openEditCollegeFacilityModal(facility);
         });
-      } else {
-        tableBody.innerHTML = `<tr><td colspan='4'>No records found.</td></tr>`;
-      }
-    } catch (err) {
-      tableBody.innerHTML = `<tr><td colspan='4'>Failed to load records.</td></tr>`;
+      });
+
+      deleteButtons.forEach((btn) => {
+        btn.addEventListener("click", function (e) {
+          e.stopPropagation();
+          const id = this.getAttribute("data-id");
+          if (confirm("Are you sure you want to delete this facility?")) {
+            deleteCollegeFacility(id);
+          }
+        });
+      });
     }
   }
 
-  function resetForm() {
-    editingId = null;
-    nameInput.value = "";
-    logoInput.value = "";
-    submitBtn.style.display = "inline-block";
-    updateBtn.style.display = "none";
-    backBtn.style.display = "none";
+  // Event handler function using event delegation
+  function handleTableClick(event) {
+    const target = event.target;
+
+    // Handle edit button clicks - check if clicked on button or icon inside button
+    if (target.closest(".edit-state-btn")) {
+      const btn = target.closest(".edit-state-btn");
+      const id = btn.getAttribute("data-id");
+      const facility = allCollegeFacilities.find((f) => f._id === id);
+      if (facility) openEditCollegeFacilityModal(facility);
+    }
+
+    // Handle delete button clicks - check if clicked on button or icon inside button
+    if (target.closest(".delete-state-btn")) {
+      const btn = target.closest(".delete-state-btn");
+      const id = btn.getAttribute("data-id");
+      if (confirm("Are you sure you want to delete this facility?")) {
+        deleteCollegeFacility(id);
+      }
+    }
   }
 
-  // Add new facility
-  form.addEventListener("submit", async function (e) {
-    e.preventDefault();
-    if (editingId) return; // Prevent submit if editing
-    const name = nameInput.value.trim();
-    if (!name) return alert("Please enter facility name.");
-    const formData = new FormData();
-    formData.append("name", name);
-    if (logoInput.files[0]) formData.append("logo", logoInput.files[0]);
+  // Fetch all college facilities
+  async function fetchCollegeFacilities() {
     try {
-      const res = await fetch(
-        "http://localhost:4000/api/college-facility/add-college-facility",
-        {
-          method: "POST",
-          body: formData,
-        }
+      allCollegeFacilities = await apiRequest(
+        `${baseUrl}/college-facility/all-college-facility`
       );
-      if (res.ok) {
-        resetForm();
-        fetchFacilities();
+      initPaginationForCollegeFacilities(); // Changed from renderCollegeFacilityTable(allCollegeFacilities)
+    } catch (err) {
+      collegeFacilityTable.innerHTML =
+        '<tr><td colspan="4" style="text-align:center; color:#ef4444;">Failed to load data</td></tr>';
+    }
+  }
+
+  // Initialize pagination for college facilities
+  function initPaginationForCollegeFacilities() {
+    // Create pagination container if it doesn't exist
+    let paginationContainer = document.getElementById("pagination-container");
+    if (!paginationContainer) {
+      paginationContainer = document.createElement("div");
+      paginationContainer.id = "pagination-container";
+      paginationContainer.className = "pagination-wrapper";
+      // Insert after the table container
+      const tableContainer = collegeFacilityTable.closest(".table-container");
+      if (tableContainer) {
+        tableContainer.parentNode.insertBefore(
+          paginationContainer,
+          tableContainer.nextSibling
+        );
       } else {
-        alert("Failed to add facility.");
+        collegeFacilityTable.parentNode.appendChild(paginationContainer);
       }
-    } catch {
-      alert("Error adding facility.");
+    }
+
+    // Initialize pagination
+    pagination = initPagination({
+      container: collegeFacilityTable,
+      data: allCollegeFacilities,
+      itemsPerPage: 10,
+      renderFunction: renderCollegeFacilityTable,
+      onPageChange: (currentData, currentPage) => {
+        // Re-add event listeners after page change
+        setTimeout(() => {
+          addEventListeners();
+        }, 100);
+      },
+    });
+  }
+
+  // Show/hide form and list with button toggle
+  const showFormBtn = document.getElementById("showFormBtn");
+  const showListBtn = document.getElementById("showListBtn");
+  if (showFormBtn && showListBtn && formDiv && listDiv) {
+    showFormBtn.addEventListener("click", function () {
+      formDiv.style.display = "block";
+      listDiv.style.display = "none";
+      // Show both buttons
+      showFormBtn.style.display = "inline-block";
+      showListBtn.style.display = "inline-block";
+    });
+    showListBtn.addEventListener("click", function () {
+      formDiv.style.display = "none";
+      listDiv.style.display = "block";
+      // Show both buttons
+      showFormBtn.style.display = "inline-block";
+      showListBtn.style.display = "inline-block";
+    });
+  }
+
+  // Add college facility using common form handler
+  handleForm(collegeFacilityForm, async (formData) => {
+    try {
+      const name = formData.get("name");
+      if (!name) {
+        alert("Please enter facility name.");
+        return;
+      }
+      await apiRequest(`${baseUrl}/college-facility/add-college-facility`, {
+        method: "POST",
+        body: formData,
+      });
+      alert("College Facility added!");
+      collegeFacilityForm.reset();
+      formDiv.style.display = "none";
+      listDiv.style.display = "block";
+      // Show both buttons
+      showFormBtn.style.display = "inline-block";
+      showListBtn.style.display = "inline-block";
+      fetchCollegeFacilities();
+    } catch (error) {
+      alert("Failed to submit college facility.");
     }
   });
 
-  // Update facility
-  updateBtn.addEventListener("click", async function () {
-    const name = nameInput.value.trim();
-    if (!editingId || !name) return;
-    const formData = new FormData();
-    formData.append("name", name);
-    if (logoInput.files[0]) formData.append("logo", logoInput.files[0]);
+  // Delete college facility using common API utility
+  async function deleteCollegeFacility(id) {
     try {
-      const res = await fetch(
-        `http://localhost:4000/api/college-facility/update-college-facility/${editingId}`,
+      await apiRequest(
+        `${baseUrl}/college-facility/delete-college-facility/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
+      alert("College Facility deleted!");
+      fetchCollegeFacilities();
+    } catch (error) {
+      alert("Failed to delete college facility.");
+    }
+  }
+
+  // Edit modal logic
+  const editCollegeFacilityModal = document.getElementById(
+    "editCollegeFacilityModal"
+  );
+  const closeEditCollegeFacilityModalBtn = document.getElementById(
+    "closeEditCollegeFacilityModal"
+  );
+  const cancelEditCollegeFacilityBtn = document.getElementById(
+    "cancelEditCollegeFacilityBtn"
+  );
+  function openEditCollegeFacilityModal(facility) {
+    document.getElementById("editCollegeFacilityId").value = facility._id;
+    document.getElementById("editCollegeFacilityName").value = facility.name;
+    if (editCollegeFacilityModal)
+      editCollegeFacilityModal.style.display = "flex";
+  }
+  function closeEditCollegeFacilityModal() {
+    if (editCollegeFacilityModal)
+      editCollegeFacilityModal.style.display = "none";
+  }
+  if (closeEditCollegeFacilityModalBtn)
+    closeEditCollegeFacilityModalBtn.onclick = closeEditCollegeFacilityModal;
+  if (cancelEditCollegeFacilityBtn)
+    cancelEditCollegeFacilityBtn.onclick = closeEditCollegeFacilityModal;
+  window.onclick = function (event) {
+    if (event.target === editCollegeFacilityModal)
+      closeEditCollegeFacilityModal();
+  };
+
+  // Edit form submit using common form handler
+  const editCollegeFacilityForm = document.getElementById(
+    "editCollegeFacilityForm"
+  );
+  handleForm(editCollegeFacilityForm, async (formData) => {
+    const id = document.getElementById("editCollegeFacilityId").value;
+    try {
+      const name = formData.get("name");
+      if (!name) {
+        alert("Please enter facility name.");
+        return;
+      }
+      await apiRequest(
+        `${baseUrl}/college-facility/update-college-facility/${id}`,
         {
           method: "PUT",
           body: formData,
         }
       );
-      if (res.ok) {
-        resetForm();
-        fetchFacilities();
-      } else {
-        alert("Failed to update facility.");
-      }
-    } catch {
-      alert("Error updating facility.");
+      alert("College Facility updated!");
+      closeEditCollegeFacilityModal();
+      fetchCollegeFacilities();
+    } catch (error) {
+      alert("Failed to update college facility.");
     }
   });
 
-  // Back button logic
-  backBtn.addEventListener("click", function () {
-    resetForm();
-    fetchFacilities();
-  });
-
-  // Delegate edit and delete button events
-  tableBody.addEventListener("click", async function (e) {
-    const editBtn = e.target.closest(".edit-btn");
-    const deleteBtn = e.target.closest(".delete-btn");
-    if (editBtn) {
-      const id = editBtn.getAttribute("data-id");
-      // Find the row and set input for editing
-      const row = editBtn.closest("tr");
-      nameInput.value = row.children[1].textContent;
-      // Note: For image, user must re-upload if changing
-      editingId = id;
-      submitBtn.style.display = "none";
-      updateBtn.style.display = "inline-block";
-      backBtn.style.display = "inline-block";
-    } else if (deleteBtn) {
-      const id = deleteBtn.getAttribute("data-id");
-      if (confirm("Are you sure you want to delete this facility?")) {
-        try {
-          const res = await fetch(
-            `http://localhost:4000/api/college-facility/delete-college-facility/${id}`,
-            {
-              method: "DELETE",
-            }
-          );
-          if (res.ok) {
-            fetchFacilities();
-            if (editingId === id) {
-              resetForm();
-            }
-          } else {
-            alert("Failed to delete facility.");
-          }
-        } catch {
-          alert("Error deleting facility.");
-        }
-      }
-    }
-  });
-
-  // Initial fetch
-  fetchFacilities();
-  resetForm();
+  // Initial population
+  fetchCollegeFacilities();
 });

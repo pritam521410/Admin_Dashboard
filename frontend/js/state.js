@@ -136,16 +136,16 @@ document.addEventListener("DOMContentLoaded", function () {
     showFormBtn.addEventListener("click", function () {
       formDiv.style.display = "block";
       listDiv.style.display = "none";
-      // Hide Add Record button, show Record List button
-      showFormBtn.style.display = "none";
+      // Show both buttons
+      showFormBtn.style.display = "inline-block";
       showListBtn.style.display = "inline-block";
     });
     showListBtn.addEventListener("click", function () {
       formDiv.style.display = "none";
       listDiv.style.display = "block";
-      // Hide Record List button, show Add Record button
-      showListBtn.style.display = "none";
+      // Show both buttons
       showFormBtn.style.display = "inline-block";
+      showListBtn.style.display = "inline-block";
     });
   }
 
@@ -160,6 +160,9 @@ document.addEventListener("DOMContentLoaded", function () {
       stateForm.reset();
       formDiv.style.display = "none";
       listDiv.style.display = "block";
+      // Show both buttons
+      showFormBtn.style.display = "inline-block";
+      showListBtn.style.display = "inline-block";
       fetchStates();
     } catch (error) {
       alert("Failed to submit state.");

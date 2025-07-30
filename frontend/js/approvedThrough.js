@@ -1,152 +1,265 @@
-// Approved Through Management JavaScript
-
 document.addEventListener("DOMContentLoaded", function () {
-  const form = document.querySelector(".degree-form");
-  const input = document.getElementById("approverName");
-  const submitBtn = document.getElementById("approverSubmit");
-  const updateBtn = document.getElementById("approverUpdate");
-  const backBtn = document.getElementById("approverBack");
-  const tableBody = document.querySelector(".degree-table tbody");
+  const baseUrl = window.baseUrl || "http://localhost:4000/api";
+  if (typeof initSidebar === "function") initSidebar();
 
-  let editingId = null;
+  const approvedThroughForm = document.getElementById("approvedThroughForm");
+  const formDiv = document.getElementById("formDiv");
+  const listDiv = document.getElementById("listDiv");
+  const approvedThroughTable = document.getElementById("approvedThroughTable");
+  let allApprovedThrough = [];
+  let pagination = null; // Added for pagination
 
-  // Fetch and render all approvers
-  async function fetchApprovers() {
-    tableBody.innerHTML = "";
-    try {
-      const res = await fetch(
-        "http://localhost:4000/api/approved-through/all-approved-through"
-      );
-      const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) {
-        data.forEach((item, idx) => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${idx + 1}</td>
-            <td>${item.approvesThroughName}</td>
-            <td>
-              <button class="edit-btn" style="background:#2563eb;color:#fff;border:none;border-radius:6px;padding:6px 12px;cursor:pointer;margin-right:6px;" data-id="${
-                item._id
-              }"><i class="fa fa-edit"></i></button>
-              <button class="delete-btn" style="background:#e53935;color:#fff;border:none;border-radius:6px;padding:6px 12px;cursor:pointer;" data-id="${
-                item._id
-              }"><i class="fa fa-trash"></i></button>
-            </td>
-          `;
-          tableBody.appendChild(tr);
+  // Custom render function for approved through (for pagination)
+  function renderApprovedThroughTable(data, startIndex) {
+    if (!approvedThroughTable) return;
+
+    approvedThroughTable.innerHTML = data
+      .map(
+        (a, i) => `
+      <tr>
+        <td>${startIndex + i + 1}</td>
+        <td>${a.approvesThroughName || ""}</td>
+        <td class="action-buttons">
+          <button class="edit-state-btn" data-id="${
+            a._id
+          }"><i class="fa fa-edit"></i></button>
+          <button class="delete-state-btn" data-id="${
+            a._id
+          }"><i class="fa fa-trash"></i></button>
+        </td>
+      </tr>
+    `
+      )
+      .join("");
+
+    // Add event listeners for edit and delete buttons
+    addEventListeners();
+  }
+
+  // Add event listeners for edit and delete buttons (separate function)
+  function addEventListeners() {
+    // Use event delegation for better reliability
+    if (approvedThroughTable) {
+      // Remove existing listener to prevent duplicates
+      approvedThroughTable.removeEventListener("click", handleTableClick);
+      approvedThroughTable.addEventListener("click", handleTableClick);
+
+      // Also add direct event listeners to buttons for better compatibility
+      const editButtons =
+        approvedThroughTable.querySelectorAll(".edit-state-btn");
+      const deleteButtons =
+        approvedThroughTable.querySelectorAll(".delete-state-btn");
+
+      editButtons.forEach((btn) => {
+        btn.addEventListener("click", function (e) {
+          e.stopPropagation();
+          const id = this.getAttribute("data-id");
+          const approvedThrough = allApprovedThrough.find((a) => a._id === id);
+          if (approvedThrough) openEditApprovedThroughModal(approvedThrough);
         });
-      } else {
-        tableBody.innerHTML = `<tr><td colspan='3'>No records found.</td></tr>`;
-      }
-    } catch (err) {
-      tableBody.innerHTML = `<tr><td colspan='3'>Failed to load records.</td></tr>`;
+      });
+
+      deleteButtons.forEach((btn) => {
+        btn.addEventListener("click", function (e) {
+          e.stopPropagation();
+          const id = this.getAttribute("data-id");
+          if (
+            confirm("Are you sure you want to delete this approved through?")
+          ) {
+            deleteApprovedThrough(id);
+          }
+        });
+      });
     }
   }
 
-  function resetForm() {
-    editingId = null;
-    input.value = "";
-    submitBtn.style.display = "inline-block";
-    updateBtn.style.display = "none";
-    backBtn.style.display = "none";
+  // Event handler function using event delegation
+  function handleTableClick(event) {
+    const target = event.target;
+
+    // Handle edit button clicks - check if clicked on button or icon inside button
+    if (target.closest(".edit-state-btn")) {
+      const btn = target.closest(".edit-state-btn");
+      const id = btn.getAttribute("data-id");
+      const approvedThrough = allApprovedThrough.find((a) => a._id === id);
+      if (approvedThrough) openEditApprovedThroughModal(approvedThrough);
+    }
+
+    // Handle delete button clicks - check if clicked on button or icon inside button
+    if (target.closest(".delete-state-btn")) {
+      const btn = target.closest(".delete-state-btn");
+      const id = btn.getAttribute("data-id");
+      if (confirm("Are you sure you want to delete this approved through?")) {
+        deleteApprovedThrough(id);
+      }
+    }
   }
 
-  // Add new approver
-  form.addEventListener("submit", async function (e) {
-    e.preventDefault();
-    if (editingId) return; // Prevent submit if editing
-    const value = input.value.trim();
-    if (!value) return alert("Please enter an approver board name.");
+  // Fetch all approved through
+  async function fetchApprovedThrough() {
     try {
-      const res = await fetch(
-        "http://localhost:4000/api/approved-through/add-approved-through",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ approvesThroughName: value }),
-        }
+      allApprovedThrough = await apiRequest(
+        `${baseUrl}/approved-through/all-approved-through`
       );
-      if (res.ok) {
-        input.value = "";
-        fetchApprovers();
+      initPaginationForApprovedThrough(); // Changed from renderApprovedThroughTable(allApprovedThrough)
+    } catch (err) {
+      approvedThroughTable.innerHTML =
+        '<tr><td colspan="3" style="text-align:center; color:#ef4444;">Failed to load data</td></tr>';
+    }
+  }
+
+  // Initialize pagination for approved through
+  function initPaginationForApprovedThrough() {
+    // Create pagination container if it doesn't exist
+    let paginationContainer = document.getElementById("pagination-container");
+    if (!paginationContainer) {
+      paginationContainer = document.createElement("div");
+      paginationContainer.id = "pagination-container";
+      paginationContainer.className = "pagination-wrapper";
+      // Insert after the table container
+      const tableContainer = approvedThroughTable.closest(".table-container");
+      if (tableContainer) {
+        tableContainer.parentNode.insertBefore(
+          paginationContainer,
+          tableContainer.nextSibling
+        );
       } else {
-        alert("Failed to add approver.");
+        approvedThroughTable.parentNode.appendChild(paginationContainer);
       }
-    } catch {
-      alert("Error adding approver.");
+    }
+
+    // Initialize pagination
+    pagination = initPagination({
+      container: approvedThroughTable,
+      data: allApprovedThrough,
+      itemsPerPage: 10,
+      renderFunction: renderApprovedThroughTable,
+      onPageChange: (currentData, currentPage) => {
+        // Re-add event listeners after page change
+        setTimeout(() => {
+          addEventListeners();
+        }, 100);
+      },
+    });
+  }
+
+  // Show/hide form and list with button toggle
+  const showFormBtn = document.getElementById("showFormBtn");
+  const showListBtn = document.getElementById("showListBtn");
+  if (showFormBtn && showListBtn && formDiv && listDiv) {
+    showFormBtn.addEventListener("click", function () {
+      formDiv.style.display = "block";
+      listDiv.style.display = "none";
+      // Show both buttons
+      showFormBtn.style.display = "inline-block";
+      showListBtn.style.display = "inline-block";
+    });
+    showListBtn.addEventListener("click", function () {
+      formDiv.style.display = "none";
+      listDiv.style.display = "block";
+      // Show both buttons
+      showFormBtn.style.display = "inline-block";
+      showListBtn.style.display = "inline-block";
+    });
+  }
+
+  // Add approved through using common form handler
+  handleForm(approvedThroughForm, async (formData) => {
+    try {
+      const approvesThroughName = formData.get("approvesThroughName");
+      await apiRequest(`${baseUrl}/approved-through/add-approved-through`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ approvesThroughName }),
+      });
+      alert("Approved Through added!");
+      approvedThroughForm.reset();
+      formDiv.style.display = "none";
+      listDiv.style.display = "block";
+      // Show both buttons
+      showFormBtn.style.display = "inline-block";
+      showListBtn.style.display = "inline-block";
+      fetchApprovedThrough();
+    } catch (error) {
+      alert("Failed to submit approved through.");
     }
   });
 
-  // Update approver
-  updateBtn.addEventListener("click", async function () {
-    const value = input.value.trim();
-    if (!editingId || !value) return;
+  // Delete approved through using common API utility
+  async function deleteApprovedThrough(id) {
     try {
-      const res = await fetch(
-        `http://localhost:4000/api/approved-through/update-approved-through/${editingId}`,
+      await apiRequest(
+        `${baseUrl}/approved-through/delete-approved-through/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
+      alert("Approved Through deleted!");
+      fetchApprovedThrough();
+    } catch (error) {
+      alert("Failed to delete approved through.");
+    }
+  }
+
+  // Edit modal logic
+  const editApprovedThroughModal = document.getElementById(
+    "editApprovedThroughModal"
+  );
+  const closeEditApprovedThroughModalBtn = document.getElementById(
+    "closeEditApprovedThroughModal"
+  );
+  const cancelEditApprovedThroughBtn = document.getElementById(
+    "cancelEditApprovedThroughBtn"
+  );
+  function openEditApprovedThroughModal(approvedThrough) {
+    document.getElementById("editApprovedThroughId").value =
+      approvedThrough._id;
+    document.getElementById("editApprovedThroughName").value =
+      approvedThrough.approvesThroughName;
+    if (editApprovedThroughModal)
+      editApprovedThroughModal.style.display = "flex";
+  }
+  function closeEditApprovedThroughModal() {
+    if (editApprovedThroughModal)
+      editApprovedThroughModal.style.display = "none";
+  }
+  if (closeEditApprovedThroughModalBtn)
+    closeEditApprovedThroughModalBtn.onclick = closeEditApprovedThroughModal;
+  if (cancelEditApprovedThroughBtn)
+    cancelEditApprovedThroughBtn.onclick = closeEditApprovedThroughModal;
+  window.onclick = function (event) {
+    if (event.target === editApprovedThroughModal)
+      closeEditApprovedThroughModal();
+  };
+
+  // Edit form submit using common form handler
+  const editApprovedThroughForm = document.getElementById(
+    "editApprovedThroughForm"
+  );
+  handleForm(editApprovedThroughForm, async (formData) => {
+    const id = document.getElementById("editApprovedThroughId").value;
+    try {
+      const approvesThroughName = formData.get("approvesThroughName");
+      await apiRequest(
+        `${baseUrl}/approved-through/update-approved-through/${id}`,
         {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ approvesThroughName: value }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ approvesThroughName }),
         }
       );
-      if (res.ok) {
-        resetForm();
-        fetchApprovers();
-      } else {
-        alert("Failed to update approver.");
-      }
-    } catch {
-      alert("Error updating approver.");
+      alert("Approved Through updated!");
+      closeEditApprovedThroughModal();
+      fetchApprovedThrough();
+    } catch (error) {
+      alert("Failed to update approved through.");
     }
   });
 
-  // Back button logic
-  backBtn.addEventListener("click", function () {
-    resetForm();
-    fetchApprovers();
-  });
-
-  // Delegate edit and delete button events
-  tableBody.addEventListener("click", async function (e) {
-    const editBtn = e.target.closest(".edit-btn");
-    const deleteBtn = e.target.closest(".delete-btn");
-    if (editBtn) {
-      const id = editBtn.getAttribute("data-id");
-      // Find the row and set input for editing
-      const row = editBtn.closest("tr");
-      const name = row.children[1].textContent;
-      input.value = name;
-      editingId = id;
-      submitBtn.style.display = "none";
-      updateBtn.style.display = "inline-block";
-      backBtn.style.display = "inline-block";
-    } else if (deleteBtn) {
-      const id = deleteBtn.getAttribute("data-id");
-      if (confirm("Are you sure you want to delete this approver?")) {
-        try {
-          const res = await fetch(
-            `http://localhost:4000/api/approved-through/delete-approved-through/${id}`,
-            {
-              method: "DELETE",
-            }
-          );
-          if (res.ok) {
-            fetchApprovers();
-            if (editingId === id) {
-              resetForm();
-            }
-          } else {
-            alert("Failed to delete approver.");
-          }
-        } catch {
-          alert("Error deleting approver.");
-        }
-      }
-    }
-  });
-
-  // Initial fetch
-  fetchApprovers();
-  resetForm();
+  // Initial population
+  fetchApprovedThrough();
 });

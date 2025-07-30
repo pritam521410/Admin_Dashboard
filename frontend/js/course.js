@@ -1,15 +1,13 @@
-// Wait for DOM to load
-window.addEventListener("DOMContentLoaded", function () {
-  // Add Course button logic: show form, clear form, and scroll to it
-  const showCourseFormBtn = document.getElementById("showCourseFormBtn");
-  const showRecordListBtn = document.getElementById("showRecordListBtn");
-  const courseFormDiv = document.getElementById("courseFormDiv");
-  const courseListDiv = document.getElementById("courseListDiv");
-  const courseTable = document.getElementById("courseTable");
-  const courseForm = courseFormDiv ? courseFormDiv.querySelector("form") : null;
+document.addEventListener("DOMContentLoaded", function () {
+  const baseUrl = window.baseUrl || "http://localhost:4000/api";
+  if (typeof initSidebar === "function") initSidebar();
 
-  let updateMode = false;
-  let updateCourseId = null;
+  const courseForm = document.getElementById("courseForm");
+  const formDiv = document.getElementById("formDiv");
+  const listDiv = document.getElementById("listDiv");
+  const courseTable = document.getElementById("courseTable");
+  let allCourses = [];
+  let pagination = null; // Added for pagination
 
   // Helper function to populate dropdowns
   async function populateDropdown(url, selectId, valueKey, textKey) {
@@ -19,17 +17,23 @@ window.addEventListener("DOMContentLoaded", function () {
       console.log(`populateDropdown for #${selectId} got:`, data);
       const select = document.getElementById(selectId);
       select.innerHTML = '<option value="">-- Select --</option>'; // Reset options
-      // For streams: data.success && data.data (array)
-      // For degrees: data.degrees (array)
+
       let items = [];
-      if (Array.isArray(data.data)) {
-        items = data.data;
+      // Handle different API response structures
+      if (data.success && Array.isArray(data.data)) {
+        items = data.data; // For streams
       } else if (Array.isArray(data.degrees)) {
-        items = data.degrees;
+        items = data.degrees; // For degrees
+      } else if (Array.isArray(data)) {
+        items = data; // Direct array
+      } else if (data.streams && Array.isArray(data.streams)) {
+        items = data.streams; // Alternative stream structure
       }
+
       if (items.length === 0) {
         console.warn(`No items found for #${selectId}. Data:`, data);
       }
+
       items.forEach((item) => {
         const option = document.createElement("option");
         option.value = item[valueKey];
@@ -41,191 +45,249 @@ window.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // Fetch and display all courses in the table
-  async function fetchAndDisplayCourses() {
-    try {
-      const res = await fetch("http://localhost:4000/api/course/all");
-      const data = await res.json();
-      const table = document.getElementById("courseTable");
-      // Table header
-      table.innerHTML = `<tr style="background:#22d3a7;color:#fff;font-weight:700;">
-        <th>#</th>
-        <th>Course Name</th>
-        <th>Degree Type</th>
-        <th>Stream Name</th>
-        <th>Action</th>
-      </tr>`;
-      if (data && Array.isArray(data.courses) && data.courses.length > 0) {
-        data.courses.forEach((course, idx) => {
-          const row = document.createElement("tr");
-          row.innerHTML = `
-            <td>${idx + 1}</td>
-            <td>${course.name || ""}</td>
-            <td>${course.degree?.name || ""}</td>
-            <td>${course.stream?.name || ""}</td>
-            <td>
-              <button class="edit-btn" style="background:#2563eb;color:#fff;border:none;padding:6px 10px;border-radius:4px;margin-right:5px;cursor:pointer;" data-id="${
-                course._id
-              }"><i class="fa fa-pen-to-square"></i></button>
-              <button class="delete-btn" style="background:#ef4444;color:#fff;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;" data-id="${
-                course._id
-              }"><i class="fa fa-trash"></i></button>
-            </td>
-          `;
-          table.appendChild(row);
-        });
-        // Attach event listeners for edit and delete
-        document.querySelectorAll(".delete-btn").forEach((btn) => {
-          btn.addEventListener("click", async function () {
-            const id = this.getAttribute("data-id");
-            if (confirm("Are you sure you want to delete this course?")) {
-              await deleteCourse(id);
-              await fetchAndDisplayCourses();
-            }
-          });
-        });
-        document.querySelectorAll(".edit-btn").forEach((btn) => {
-          btn.addEventListener("click", function () {
-            const id = this.getAttribute("data-id");
-            editCourse(id);
-          });
-        });
-      } else {
-        // No records
-        const row = document.createElement("tr");
-        row.innerHTML = `<td colspan="5" style="text-align:center;">No records found</td>`;
-        table.appendChild(row);
-      }
-    } catch (err) {
-      console.error("Error fetching courses:", err);
+  // Custom render function for courses (for pagination)
+  function renderCourseTable(data, startIndex) {
+    if (!courseTable) return;
+
+    courseTable.innerHTML = data
+      .map(
+        (c, i) => `
+      <tr>
+        <td>${startIndex + i + 1}</td>
+        <td>${c.name || ""}</td>
+        <td>${c.degree?.name || ""}</td>
+        <td>${c.stream?.name || ""}</td>
+        <td class="action-buttons">
+          <button class="edit-state-btn" data-id="${
+            c._id
+          }"><i class="fa fa-edit"></i></button>
+          <button class="delete-state-btn" data-id="${
+            c._id
+          }"><i class="fa fa-trash"></i></button>
+        </td>
+      </tr>
+    `
+      )
+      .join("");
+
+    // Add event listeners for edit and delete buttons
+    addEventListeners();
+  }
+
+  // Add event listeners for edit and delete buttons (separate function)
+  function addEventListeners() {
+    // Use event delegation for better reliability
+    if (courseTable) {
+      // Remove existing listener to prevent duplicates
+      courseTable.removeEventListener("click", handleTableClick);
+      courseTable.addEventListener("click", handleTableClick);
     }
   }
 
-  // Delete course by ID
+  // Event handler function using event delegation
+  function handleTableClick(event) {
+    const target = event.target;
+
+    // Handle edit button clicks
+    if (target.closest(".edit-state-btn")) {
+      const btn = target.closest(".edit-state-btn");
+      const id = btn.getAttribute("data-id");
+      const course = allCourses.find((c) => c._id === id);
+      if (course) openEditCourseModal(course);
+    }
+
+    // Handle delete button clicks
+    if (target.closest(".delete-state-btn")) {
+      const btn = target.closest(".delete-state-btn");
+      const id = btn.getAttribute("data-id");
+      if (confirm("Are you sure you want to delete this course?")) {
+        deleteCourse(id);
+      }
+    }
+  }
+
+  // Fetch all courses
+  async function fetchCourses() {
+    try {
+      const response = await fetch(`${baseUrl}/course/all`);
+      if (!response.ok) throw new Error("Failed to fetch courses");
+      const data = await response.json();
+      allCourses = data.courses || [];
+      initPaginationForCourses(); // Changed from renderCourseTable(allCourses)
+    } catch (err) {
+      courseTable.innerHTML =
+        '<tr><td colspan="5" style="text-align:center; color:#ef4444;">Failed to load data</td></tr>';
+    }
+  }
+
+  // Initialize pagination for courses
+  function initPaginationForCourses() {
+    // Create pagination container if it doesn't exist
+    let paginationContainer = document.getElementById("pagination-container");
+    if (!paginationContainer) {
+      paginationContainer = document.createElement("div");
+      paginationContainer.id = "pagination-container";
+      paginationContainer.className = "pagination-wrapper";
+      // Insert after the table container
+      const tableContainer = courseTable.closest(".table-container");
+      if (tableContainer) {
+        tableContainer.parentNode.insertBefore(
+          paginationContainer,
+          tableContainer.nextSibling
+        );
+      } else {
+        courseTable.parentNode.appendChild(paginationContainer);
+      }
+    }
+
+    // Initialize pagination
+    pagination = initPagination({
+      container: courseTable,
+      data: allCourses,
+      itemsPerPage: 10,
+      renderFunction: renderCourseTable,
+      onPageChange: (currentData, currentPage) => {
+        // Re-add event listeners after page change
+        setTimeout(() => {
+          addEventListeners();
+        }, 50);
+      },
+    });
+  }
+
+  // Show/hide form and list with button toggle
+  const showFormBtn = document.getElementById("showFormBtn");
+  const showListBtn = document.getElementById("showListBtn");
+  if (showFormBtn && showListBtn && formDiv && listDiv) {
+    showFormBtn.addEventListener("click", function () {
+      formDiv.style.display = "block";
+      listDiv.style.display = "none";
+      // Show both buttons
+      showFormBtn.style.display = "inline-block";
+      showListBtn.style.display = "inline-block";
+      // Populate dropdowns when form is shown
+      populateDropdown(`${baseUrl}/stream/all`, "streamName", "_id", "name");
+      populateDropdown(`${baseUrl}/degree/all`, "degreeType", "_id", "name");
+    });
+    showListBtn.addEventListener("click", function () {
+      formDiv.style.display = "none";
+      listDiv.style.display = "block";
+      // Show both buttons
+      showFormBtn.style.display = "inline-block";
+      showListBtn.style.display = "inline-block";
+    });
+  }
+
+  // Add course using common form handler
+  handleForm(courseForm, async (formData) => {
+    try {
+      // Use FormData directly for file uploads
+      await fetch(`${baseUrl}/course/add`, {
+        method: "POST",
+        body: formData, // Send FormData directly for file uploads
+      });
+      alert("Course added!");
+      courseForm.reset();
+      formDiv.style.display = "none";
+      listDiv.style.display = "block";
+      // Show both buttons
+      showFormBtn.style.display = "inline-block";
+      showListBtn.style.display = "inline-block";
+      fetchCourses();
+    } catch (error) {
+      alert("Failed to submit course.");
+    }
+  });
+
+  // Delete course using common API utility
   async function deleteCourse(id) {
     try {
-      const res = await fetch(
-        `http://localhost:4000/api/course/delete?id=${id}`,
-        {
-          method: "DELETE",
-        }
-      );
-      const data = await res.json();
-      alert(data.message || "Course deleted!");
-    } catch (err) {
+      await fetch(`${baseUrl}/course/delete?id=${id}`, {
+        method: "DELETE",
+      });
+      alert("Course deleted!");
+      fetchCourses();
+    } catch (error) {
       alert("Failed to delete course.");
-      console.error("Delete error:", err);
     }
   }
 
-  // Edit course by ID (fetch and fill form)
-  async function editCourse(id) {
+  // Edit modal logic
+  const editCourseModal = document.getElementById("editCourseModal");
+  const closeEditCourseModalBtn = document.getElementById(
+    "closeEditCourseModal"
+  );
+  const cancelEditCourseBtn = document.getElementById("cancelEditCourseBtn");
+  function openEditCourseModal(course) {
+    document.getElementById("editCourseId").value = course._id;
+    document.getElementById("editCourseName").value = course.name;
+    document.getElementById("editCourseFee").value = course.averageFee;
+    document.getElementById("editCourseDescription").value = course.description;
+
+    // Populate dropdowns for edit modal
+    populateDropdown(
+      `${baseUrl}/stream/all`,
+      "editCourseStream",
+      "_id",
+      "name"
+    );
+    populateDropdown(
+      `${baseUrl}/degree/all`,
+      "editCourseDegree",
+      "_id",
+      "name"
+    );
+
+    // Set selected values after a short delay to ensure dropdowns are populated
+    setTimeout(() => {
+      if (course.stream?._id) {
+        document.getElementById("editCourseStream").value = course.stream._id;
+      }
+      if (course.degree?._id) {
+        document.getElementById("editCourseDegree").value = course.degree._id;
+      }
+    }, 100);
+
+    if (editCourseModal) editCourseModal.style.display = "flex";
+  }
+  function closeEditCourseModal() {
+    if (editCourseModal) editCourseModal.style.display = "none";
+  }
+  if (closeEditCourseModalBtn)
+    closeEditCourseModalBtn.onclick = closeEditCourseModal;
+  if (cancelEditCourseBtn) cancelEditCourseBtn.onclick = closeEditCourseModal;
+  window.onclick = function (event) {
+    if (event.target === editCourseModal) closeEditCourseModal();
+  };
+
+  // Edit form submit using common form handler
+  const editCourseForm = document.getElementById("editCourseForm");
+  handleForm(editCourseForm, async (formData) => {
+    const id = document.getElementById("editCourseId").value;
     try {
-      const res = await fetch(`http://localhost:4000/api/course/get?id=${id}`);
-      const data = await res.json();
-      if (!data.course) {
-        alert("Course not found!");
-        return;
-      }
-      const course = data.course;
-      // Show form and fill values
-      courseFormDiv.style.display = "block";
-      courseListDiv.style.display = "none";
-      courseForm.reset();
-      document.getElementById("streamName").value = course.stream?._id || "";
-      document.getElementById("degreeType").value = course.degree?._id || "";
-      document.getElementById("courseName").value = course.name || "";
-      document.getElementById("description").value = course.description || "";
-      document.getElementById("admissionProcess").value =
-        course.admissionProcess || "";
-      document.getElementById("eligibilityCriteria").value =
-        course.eligibilityCriteria || "";
-      document.getElementById("entranceExams").value =
-        course.entranceExams || "";
-      document.getElementById("howToPrepare").value = course.howToPrepare || "";
-      document.getElementById("courseIcon").value = course.courseIcon || "";
-      document.getElementById("averageFee").value = course.averageFee || "";
-      // Note: logo cannot be pre-filled for file input
-      updateMode = true;
-      updateCourseId = id;
-      courseFormDiv.scrollIntoView({ behavior: "smooth" });
-    } catch (err) {
-      alert("Failed to fetch course for editing.");
-      console.error("Edit fetch error:", err);
+      const courseData = {
+        name: formData.get("name"),
+        stream: formData.get("stream"),
+        degree: formData.get("degree"),
+        averageFee: formData.get("averageFee"),
+        description: formData.get("description"),
+      };
+
+      await fetch(`${baseUrl}/course/update?id=${id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(courseData),
+      });
+      alert("Course updated!");
+      closeEditCourseModal();
+      fetchCourses();
+    } catch (error) {
+      alert("Failed to update course.");
     }
-  }
+  });
 
-  if (showCourseFormBtn && courseFormDiv && courseForm && courseListDiv) {
-    showCourseFormBtn.addEventListener("click", function () {
-      courseFormDiv.style.display = "block";
-      courseListDiv.style.display = "none";
-      courseForm.reset();
-      // Hide Add Record button, show Record List button
-      showCourseFormBtn.style.display = "none";
-      showRecordListBtn.style.display = "inline-block";
-      // Populate dropdowns
-      populateDropdown(
-        "http://localhost:4000/api/stream/all",
-        "streamName",
-        "_id",
-        "name"
-      );
-      populateDropdown(
-        "http://localhost:4000/api/degree/all",
-        "degreeType",
-        "_id",
-        "name"
-      );
-      courseFormDiv.scrollIntoView({ behavior: "smooth" });
-    });
-  }
-
-  if (showRecordListBtn && courseListDiv && courseFormDiv && courseTable) {
-    showRecordListBtn.addEventListener("click", async function () {
-      courseFormDiv.style.display = "none";
-      courseListDiv.style.display = "block";
-      // Hide Record List button, show Add Record button
-      showRecordListBtn.style.display = "none";
-      showCourseFormBtn.style.display = "inline-block";
-      await fetchAndDisplayCourses();
-    });
-  }
-
-  // Form submission handler (AJAX)
-  if (courseForm) {
-    courseForm.onsubmit = async function (e) {
-      e.preventDefault();
-      const formData = new FormData(courseForm);
-      try {
-        if (updateMode && updateCourseId) {
-          // Update course
-          formData.append("id", updateCourseId);
-          const response = await fetch(
-            `http://localhost:4000/api/course/update?id=${updateCourseId}`,
-            {
-              method: "POST",
-              body: formData,
-            }
-          );
-          const result = await response.json();
-          alert(result.message || "Course updated!");
-          updateMode = false;
-          updateCourseId = null;
-        } else {
-          // Add new course
-          const response = await fetch("http://localhost:4000/api/course/add", {
-            method: "POST",
-            body: formData,
-          });
-          const result = await response.json();
-          alert(result.message || "Course added!");
-        }
-        courseForm.reset();
-        // Optionally hide the form or show a success message
-      } catch (error) {
-        console.error("Error submitting form:", error);
-        alert("Failed to submit course.");
-      }
-    };
-  }
+  // Initial population
+  fetchCourses();
 });

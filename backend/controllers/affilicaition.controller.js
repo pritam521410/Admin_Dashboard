@@ -29,6 +29,9 @@ export const updateAffliciation = async (req, res) => {
       { affliciationName },
       { new: true }
     );
+    if (!updatedAffliciation) {
+      return res.status(404).json({ message: "Affiliation not found" });
+    }
     res.status(200).json(updatedAffliciation);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -38,8 +41,11 @@ export const updateAffliciation = async (req, res) => {
 export const deleteAffliciation = async (req, res) => {
   try {
     const { id } = req.params;
-    await Affliciation.findByIdAndDelete(id);
-    res.status(200).json({ message: "Affliciation deleted successfully" });
+    const deletedAffliciation = await Affliciation.findByIdAndDelete(id);
+    if (!deletedAffliciation) {
+      return res.status(404).json({ message: "Affiliation not found" });
+    }
+    res.status(200).json({ message: "Affiliation deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

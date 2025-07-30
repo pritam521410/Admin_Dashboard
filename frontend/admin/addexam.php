@@ -15,23 +15,18 @@ $pageFor = isset($_GET['type']) && $_GET['type'] == 'list' ? 'list' : 'add';
   <?php include '../components/header.php'; ?>
   <?php include '../components/sidebar.php'; ?>
       <div class="main page-transition">
-      <?php
-      $pageTitle = 'Add Exam';
-      $breadcrumb = ['Home', 'Exam Master', 'Add Exam'];
-      include '../components/breadcum.php';
-      ?>
-    <!-- Country management content (form/list) -->
-    <div class="main-container" style="max-width: 1200px; margin: 0 auto;">
-      <div class="top-btns">
-        <button id="showFormBtn" class="main-btn">
-          <span>➕</span> Add Record
-        </button>
-        <button id="showListBtn" class="main-btn success">
-          <span>📋</span> Record List
-        </button>
-      </div>
-      <div id="examFormDiv" style="display: <?= $pageFor == 'add' ? 'block' : 'none'; ?>;">
-        <form id="addExamForm" class="exam-form" enctype="multipart/form-data">
+        <?php
+        $pageTitle = 'Exam Management';
+        $breadcrumb = ['Home', 'Exam Master', 'Add Exam'];
+        include '../components/breadcum.php';
+        ?>
+     
+    <!-- Exam management content (form/list) -->
+    <div class="main-container">
+      <!-- Exam Form -->
+      <div class="state-container" id="examFormDiv" style="display: none;">
+        <h2 class="page-title">Add Exam</h2>
+        <form id="addExamForm" class="state-form" enctype="multipart/form-data">
           <div class="form-row">
             <div class="form-group">
               <label>Stream *</label>
@@ -120,14 +115,27 @@ $pageFor = isset($_GET['type']) && $_GET['type'] == 'list' ? 'list' : 'add';
           </div>
           <div class="form-actions">
             <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="button" id="cancelFormBtn" class="btn btn-secondary">Cancel</button>
             <button type="reset" class="btn btn-secondary">Reset</button>
           </div>
         </form>
       </div>
-      <div id="examListDiv" style="display: <?= $pageFor == 'list' ? 'block' : 'none'; ?>;">
-        <h2 style="margin-top: 0; color: #2563eb; font-size: 1.8rem; margin-bottom: 24px;">Exam List</h2>
-        <div style="overflow-x: auto;">
-          <table class="exam-table">
+
+      <!-- Exam List -->
+      <div class="state-container" id="examListDiv" style="display: none;">
+        <div class="page-header">
+          <h2 class="page-title">Exam List</h2>
+          <div class="top-btns">
+            <button id="showFormBtn" class="main-btn">
+              <span>➕</span> Add Record
+            </button>
+            <button id="showListBtn" class="main-btn success">
+              <span>📋</span> Record List
+            </button>
+          </div>
+        </div>
+        <div class="table-container">
+          <table class="state-table">
             <thead>
               <tr>
                 <th>#</th>
@@ -135,47 +143,49 @@ $pageFor = isset($_GET['type']) && $_GET['type'] == 'list' ? 'list' : 'add';
                 <th>Course Name</th>
                 <th>Exam Name</th>
                 <th>Exam Title</th>
-                <th style="text-align: center;">Action</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody id="examTable"></tbody>
           </table>
         </div>
       </div>
+
+      <!-- Edit Exam Modal -->
+      <div id="editExamModal" class="modal">
+        <div class="modal-content">
+          <span id="closeEditExamModal" class="modal-close">&times;</span>
+          <h2 class="modal-title">Edit Exam</h2>
+          <form id="editExamForm" class="modal-form">
+            <div class="form-group">
+              <label>Stream:</label>
+              <input type="text" id="editDepartment" name="stream" required />
+            </div>
+            <div class="form-group">
+              <label>Course Name:</label>
+              <input type="text" id="editCourse" name="course" required />
+            </div>
+            <div class="form-group">
+              <label>Exam Name:</label>
+              <input type="text" id="editExamName" name="examName" required />
+            </div>
+            <div class="form-group">
+              <label>Exam Title:</label>
+              <input type="text" id="editExamTitle" name="title" required />
+            </div>
+            <div class="modal-actions">
+              <button type="submit" class="btn btn-primary">Save</button>
+              <button type="button" id="cancelEditExamBtn" class="btn btn-secondary">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <?php include '../components/footer.php'; ?>
     </div>
-
-<!-- Edit Exam Modal -->
-<div id="editExamModal" class="modal">
-  <div class="modal-content">
-    <span id="closeEditExamModal" class="modal-close">&times;</span>
-    <h2 class="modal-title">Edit Exam</h2>
-    <form id="editExamForm" class="modal-form">
-      <div class="form-group">
-        <label>Stream:</label>
-        <input type="text" id="editDepartment" name="stream" required />
-      </div>
-      <div class="form-group">
-        <label>Course Name:</label>
-        <input type="text" id="editCourse" name="course" required />
-      </div>
-      <div class="form-group">
-        <label>Exam Name:</label>
-        <input type="text" id="editExamName" name="examName" required />
-      </div>
-      <div class="form-group">
-        <label>Exam Title:</label>
-        <input type="text" id="editExamTitle" name="title" required />
-      </div>
-      <div class="modal-actions">
-        <button type="submit" class="btn btn-primary">Save</button>
-        <button type="button" id="cancelEditExamBtn" class="btn btn-secondary">Cancel</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<!-- JS Scripts -->
-<script src="../js/common.js"></script>
-<script src="../js/addexam.js"></script>
-</body>
+    <script src="../js/script.js"></script>
+    <script src="../js/dashboard.js"></script>
+    <script src="../js/common.js"></script>
+    <script src="../js/pagination.js"></script>
+    <script src="../js/addexam.js"></script>
+  </body>
 </html>

@@ -1,4 +1,4 @@
-/* Ranking Management Styles */
+/* Exam Management Styles */
 .main-container {
   max-width: 1400px;
   margin: 0 auto;
@@ -118,7 +118,7 @@
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  min-width: 600px;
+  min-width: 800px;
 }
 
 .state-table thead tr {
@@ -131,21 +131,33 @@
   text-align: left;
   font-weight: 600;
   border-bottom: 1px solid #cbd5e1;
-  width: 33.33%;
+  width: 16.66%;
   font-size: 0.9rem;
 }
 
 .state-table th:first-child {
-  width: 33.33%;
+  width: 8%;
 }
 
 .state-table th:nth-child(2) {
-  width: 33.33%;
+  width: 18%;
 }
 
 .state-table th:nth-child(3) {
+  width: 18%;
+}
+
+.state-table th:nth-child(4) {
+  width: 18%;
+}
+
+.state-table th:nth-child(5) {
+  width: 18%;
+}
+
+.state-table th:nth-child(6) {
   text-align: center;
-  width: 33.33%;
+  width: 20%;
 }
 
 .state-table td {
@@ -174,6 +186,21 @@
 }
 
 .state-table td:nth-child(3) {
+  font-weight: 600;
+  color: #111827;
+}
+
+.state-table td:nth-child(4) {
+  font-weight: 600;
+  color: #111827;
+}
+
+.state-table td:nth-child(5) {
+  font-weight: 600;
+  color: #111827;
+}
+
+.state-table td:nth-child(6) {
   text-align: center;
 }
 

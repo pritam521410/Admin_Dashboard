@@ -2,6 +2,9 @@ import Exam from "../models/Exam.model.js";
 
 export const addExam = async (req, res) => {
   try {
+    console.log("Received exam data:", req.body);
+    console.log("Received files:", req.files);
+
     const {
       stream,
       course,
@@ -20,15 +23,24 @@ export const addExam = async (req, res) => {
     } = req.body;
     const logoFile = req.files?.logo?.[0];
     const pdfFile = req.files?.pdf?.[0];
+
+    // Validate required fields
+    if (!stream || !examName || !examLevel || !state) {
+      return res.status(400).json({
+        message:
+          "Missing required fields: stream, examName, examLevel, and state are required",
+      });
+    }
+
     const exam = new Exam({
       stream,
       course,
       examName,
       title,
-      displayRank,
+      displayRank: displayRank || 0,
       noOfApplication,
       purpose,
-      applicationFee,
+      applicationFee: applicationFee || 0,
       applicationDate,
       examDate,
       resultDate,
