@@ -5,7 +5,7 @@ const courseDurationSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-});
+}, { timestamps: true });
 
 const CourseDuration = mongoose.model("CourseDuration", courseDurationSchema);
 

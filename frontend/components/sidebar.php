@@ -19,7 +19,7 @@ $sidebarMenu = [
   [
     'label' => 'Master Data',
     'icon' => 'fa-database',
-    'pages' => ['stream', 'degreetype', 'coursename', 'courseduration', 'affiliationname', 'approvedthrough', 'examthrough', 'ranking', 'ownership', 'college-facilities'],
+    'pages' => ['stream', 'degree', 'course', 'course_duration', 'affilication', 'approvedThrough', 'examType', 'ranking', 'ownership', 'collegeFacility'],
     'children' => [
       ['label' => 'Stream', 'href' => 'stream.php'],
       ['label' => 'Degree Type', 'href' => 'degree.php'],
@@ -36,7 +36,7 @@ $sidebarMenu = [
   [
     'label' => 'College Master',
     'icon' => 'fa-university',
-    'pages' => ['addcollege', 'collegelist', 'datadisplay', 'collegeview'],
+    'pages' => ['addcollege', 'datadisplay', 'collegeview'],
     'children' => [
       ['label' => 'Add College', 'href' => 'addcollege.php'],
       ['label' => 'College List', 'href' => 'addcollege.php'],
@@ -47,7 +47,7 @@ $sidebarMenu = [
   [
     'label' => 'Exam Master',
     'icon' => 'fa-file-alt',
-    'pages' => ['examlevel', 'addexam', 'examlist'],
+    'pages' => ['examlevel', 'addexam'],
     'children' => [
       ['label' => 'Exam Level', 'href' => 'examlevel.php'],
       ['label' => 'Add Exam', 'href' => 'addexam.php'],
@@ -87,54 +87,52 @@ $sidebarMenu = [
 $currentPage = str_replace('/', '', str_replace('.php', '', str_replace('.html', '', $_SERVER['PHP_SELF'])));
 ?>
 <!-- Sidebar Component -->
-<div class="sidebar">
+<div class="sidebar hide-scrollbar" >
   <div class="logo">
     <img src="https://img.icons8.com/color/48/000000/school-building.png" alt="Logo" />
     <h2><b>BAMS KARNATAKA</b></h2>
   </div>
+  <?php
+  $reqURI = explode('/', $_SERVER['PHP_SELF']);
+  $reqURI = $reqURI[count($reqURI) - 1];
+  $reqURI = str_replace('.php', '', $reqURI);
+  $currentPage = str_replace('.html', '', $reqURI);
+  ?>
   <nav>
     <ul class="menu-list">
       <?php foreach ($sidebarMenu as $i => $item): ?>
         <?php
-        $submenuOpen = false;
+        $submenuOpen = 'no';
         if (isset($item['children'])) {
           if (in_array($currentPage, $item['pages'])) {
-            $submenuOpen = true;
+            $submenuOpen = 'yes';
           }
         }
         ?>
-        <li class="menu-item<?php if (isset($item['children'])) echo ' has-submenu'; ?>">
+        <li class="menu-item<?= isset($item['children']) ? ' has-submenu' : ''; ?>">
           <?php if (isset($item['children'])): ?>
             <button class="menu-btn" type="button">
-              <?php if (!empty($item['ad'])): ?>
-                <span style="font-size: 1.1em; background: #fff; color: #232b35; border-radius: 3px; padding: 2px 6px; margin-right: 8px; font-weight: bold;">Ad</span>
-              <?php elseif (!empty($item['icon'])): ?>
-                <i class="fa <?php echo $item['icon']; ?>"></i>
-              <?php endif; ?>
-              <span class="menu-label"><?php echo $item['label']; ?></span>
-              <i class="fa fa-chevron-down submenu-chevron" style="margin-left: auto"></i>
+              <?= !empty($item['ad']) ? '<span style="font-size: 1.1em; background: #fff; color: #232b35; border-radius: 3px; padding: 2px 6px; margin-right: 8px; font-weight: bold;">Ad</span>' : ''; ?>
+              <?= !empty($item['icon']) ? '<i class="fa ' . $item['icon'] . '"></i>' : ''; ?>
+              <span class="menu-label"><?= $item['label']; ?></span>
+              <i class="fa fa-chevron-down submenu-chevron" style="margin-left: auto <?= $submenuOpen == 'yes' ? 'transform: rotate(180deg); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)' : 'transform: rotate(0deg); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)'; ?>"></i>
             </button>
-            <ul class="submenu <?php if ($submenuOpen) echo 'open'; ?>">
-              
+            <ul class="submenu <?= $submenuOpen == 'yes' ? 'open' : ''; ?>">       
               <?php foreach ($item['children'] as $child): ?>
                 <?php $childPage = preg_replace('/\.(php|html)$/', '', $child['href']); ?>
                 <li>
-                  <a href="<?php echo $child['href']; ?>" class="<?php echo ($currentPage === $childPage) ? 'active' : ''; ?>" style="color: inherit; text-decoration: none; padding-left: 40px;">
-                    <?php echo $child['label']; ?>
+                  <a href="<?= $child['href']; ?>" class="<?= $currentPage == $childPage ? 'active' : ''; ?>" style="color: inherit; text-decoration: none; padding-left: 40px;">
+                    <?= $child['label']; ?>
                   </a>
                 </li>
               <?php endforeach; ?>
             </ul>
           <?php else: ?>
             <?php $mainPage = isset($item['href']) ? preg_replace('/\.(php|html)$/', '', $item['href']) : ''; ?>
-            <a href="<?php echo $item['href']; ?>" class="<?php echo ($currentPage === $mainPage) ? 'active' : ''; ?><?php echo !empty($item['badge']) ? ' active' : ''; ?>">
-              <?php if (!empty($item['icon'])): ?>
-                <i class="fa <?php echo $item['icon']; ?>"></i>
-              <?php endif; ?>
-              <span class="menu-label"><?php echo $item['label']; ?></span>
-              <?php if (!empty($item['badge'])): ?>
-                <span class="badge"><?php echo $item['badge']; ?></span>
-              <?php endif; ?>
+            <a href="<?= $item['href']; ?>" class="<?= $currentPage == $mainPage ? 'active' : ''; ?><?= !empty($item['badge']) ? ' active' : ''; ?>">
+              <?= !empty($item['icon']) ? '<i class="fa ' . $item['icon'] . '"></i>' : ''; ?>
+              <span class="menu-label"><?= $item['label']; ?></span>
+              <?= !empty($item['badge']) ? '<span class="badge">' . $item['badge'] . '</span>' : ''; ?>
             </a>
           <?php endif; ?>
         </li>

@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
   const baseUrl = window.baseUrl || "http://localhost:4000/api";
-  if (typeof initSidebar === "function") initSidebar();
 
   const streamForm = document.getElementById("streamForm");
   const formDiv = document.getElementById("formDiv");
@@ -117,30 +116,45 @@ document.addEventListener("DOMContentLoaded", function () {
         // Re-add event listeners after page change
         setTimeout(() => {
           addEventListeners();
-        }, 50);
+        }, 100);
       },
     });
   }
 
-  // Show/hide form and list with button toggle
+  // Button elements
   const showFormBtn = document.getElementById("showFormBtn");
   const showListBtn = document.getElementById("showListBtn");
-  if (showFormBtn && showListBtn && formDiv && listDiv) {
-    showFormBtn.addEventListener("click", function () {
-      formDiv.style.display = "block";
-      listDiv.style.display = "none";
-      // Show both buttons
-      showFormBtn.style.display = "inline-block";
-      showListBtn.style.display = "inline-block";
-    });
-    showListBtn.addEventListener("click", function () {
-      formDiv.style.display = "none";
-      listDiv.style.display = "block";
-      // Show both buttons
-      showFormBtn.style.display = "inline-block";
-      showListBtn.style.display = "inline-block";
-    });
+  const cancelFormBtn = document.getElementById("cancelFormBtn");
+
+  // Show/hide form and list with button toggle
+  function showForm() {
+    if (formDiv) formDiv.style.display = "block";
+    if (listDiv) listDiv.style.display = "none";
+    if (showFormBtn) showFormBtn.style.display = "none"; // Hide Add Record
+    if (showListBtn) showListBtn.style.display = "inline-block"; // Show Record List
   }
+
+  function showList() {
+    if (formDiv) formDiv.style.display = "none";
+    if (listDiv) listDiv.style.display = "block";
+    if (showListBtn) showListBtn.style.display = "none"; // Hide Record List
+    if (showFormBtn) showFormBtn.style.display = "inline-block"; // Show Add Record
+  }
+
+  // Show both buttons initially
+  function showBothButtons() {
+    if (showFormBtn) showFormBtn.style.display = "inline-block";
+    if (showListBtn) showListBtn.style.display = "inline-block";
+  }
+
+  // Event listeners for buttons
+  if (showFormBtn) showFormBtn.addEventListener("click", showForm);
+  if (showListBtn) showListBtn.addEventListener("click", showList);
+  if (cancelFormBtn) cancelFormBtn.addEventListener("click", showList); // Cancel button calls showList
+
+  // Initial state
+  showList(); // Show list by default
+  showBothButtons(); // Show both buttons initially
 
   // Add stream using common form handler
   handleForm(streamForm, async (formData) => {
@@ -151,11 +165,7 @@ document.addEventListener("DOMContentLoaded", function () {
       });
       alert("Stream added!");
       streamForm.reset();
-      formDiv.style.display = "none";
-      listDiv.style.display = "block";
-      // Show both buttons
-      showFormBtn.style.display = "inline-block";
-      showListBtn.style.display = "inline-block";
+      showList(); // Use showList function instead of manual display
       fetchStreams();
     } catch (error) {
       alert("Failed to submit stream.");
@@ -213,26 +223,6 @@ document.addEventListener("DOMContentLoaded", function () {
       alert("Failed to update stream.");
     }
   });
-
-  // Section management for stream form
-  const addSectionBtn = document.querySelector(".add-section-btn");
-  const sectionContainer = document.getElementById("section-container");
-  const initialBlock = document.getElementById("section-initial-block");
-
-  if (addSectionBtn && sectionContainer) {
-    addSectionBtn.addEventListener("click", function () {
-      const newSection = document.createElement("div");
-      newSection.className = "section-block";
-      newSection.innerHTML = `
-        <label>Section Title</label>
-        <input type="text" name="section_title[]" placeholder="Section Title">
-        <label>Description</label>
-        <textarea name="section_description[]" placeholder="Description"></textarea>
-        <button type="button" class="remove-section-btn" onclick="this.parentElement.remove()">Remove Section</button>
-      `;
-      sectionContainer.appendChild(newSection);
-    });
-  }
 
   // Initial population
   fetchStreams();

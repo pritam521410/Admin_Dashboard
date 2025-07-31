@@ -170,7 +170,6 @@ document.addEventListener("DOMContentLoaded", () => {
   countForDashboard();
   streamCountForDashboard();
 });
-
 // === Prevent Sidebar Close on Submenu Click ===
 document.querySelectorAll(".sidebar nav .submenu li a").forEach((link) => {
   link.addEventListener("click", function () {
@@ -184,3 +183,4 @@ document.querySelectorAll(".sidebar nav .submenu li a").forEach((link) => {
     }
   });
 });
+

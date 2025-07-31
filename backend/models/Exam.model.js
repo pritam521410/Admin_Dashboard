@@ -25,10 +25,6 @@ const ExamSchema = new mongoose.Schema(
       ref: "ExamLevel",
       required: true,
     },
-    examType: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "ExamType",
-    },
     state: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "State",

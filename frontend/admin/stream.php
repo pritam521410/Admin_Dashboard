@@ -25,30 +25,23 @@
         <h2 class="page-title">Add Stream</h2>
         <form id="streamForm" class="state-form" enctype="multipart/form-data">
           <div class="form-row">
-            <div class="form-group" style="min-width: 200px;">
-              <label>Stream Name:</label>
+            <div class="form-group">
+              <label>Stream Name *</label>
               <input type="text" name="name" required placeholder="Enter stream name" />
             </div>
-            <div class="form-group" style="min-width: 200px;">
-              <label>Stream Logo:</label>
+            <div class="form-group">
+              <label>Stream Logo</label>
               <input type="file" name="logo" accept="image/*" />
             </div>
           </div>
           <div class="form-group">
-            <label>About Stream:</label>
+            <label>About Stream *</label>
             <textarea name="about" required rows="4" placeholder="Enter stream description"></textarea>
           </div>
-          <div class="section-block" id="section-initial-block">
-            <label>Section Title</label>
-            <input type="text" name="section_title[]" placeholder="Section Title">
-            <label>Description</label>
-            <textarea name="section_description[]" placeholder="Description"></textarea>
-          </div>
-          <div id="section-container"></div>
-          <button type="button" class="add-section-btn">+ Add New Section</button>
           <div class="form-actions">
             <button type="submit" class="btn btn-primary">Submit</button>
-            <button type="button" onclick="document.getElementById('showListBtn').click()" class="btn btn-secondary">Cancel</button>
+            <button type="button" id="cancelFormBtn" class="btn btn-secondary">Cancel</button>
+            <button type="reset" class="btn btn-secondary">Reset</button>
           </div>
         </form>
       </div>
@@ -90,15 +83,15 @@
           <form id="editStreamForm" class="modal-form" enctype="multipart/form-data">
             <input type="hidden" name="id" id="editStreamId" />
             <div class="form-group">
-              <label>Stream Name:</label>
+              <label>Stream Name *</label>
               <input type="text" name="name" id="editStreamName" required />
             </div>
             <div class="form-group">
-              <label>About Stream:</label>
+              <label>About Stream *</label>
               <textarea name="about" id="editStreamAbout" required rows="3"></textarea>
             </div>
             <div class="form-group">
-              <label>Stream Logo:</label>
+              <label>Stream Logo</label>
               <input type="file" name="logo" id="editStreamLogo" accept="image/*" />
             </div>
             <div class="modal-actions">
@@ -110,6 +103,7 @@
       </div>
       <?php include '../components/footer.php'; ?>
     </div>
+    <script src="../js/sidebar.js"></script>
     <script src="../js/script.js"></script>
     <script src="../js/dashboard.js"></script>
     <script src="../js/common.js"></script>

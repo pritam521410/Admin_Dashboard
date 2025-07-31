@@ -1,11 +1,10 @@
 // Course Duration Management JavaScript
 
 document.addEventListener("DOMContentLoaded", function () {
-  // Initialize sidebar
-  initSidebar();
+  // Sidebar is automatically initialized by sidebar.js
 
   // Base URL for API
-  const baseUrl = "http://localhost:4000/api";
+  const baseUrl = window.baseUrl || "http://localhost:4000/api";
 
   // DOM elements
   const courseDurationForm = document.getElementById("courseDurationForm");
@@ -111,10 +110,13 @@ document.addEventListener("DOMContentLoaded", function () {
       allCourseDurations = await apiRequest(
         `${baseUrl}/course-duration/all-course-duration`
       );
-      initPaginationForCourseDurations(); // Changed from renderCourseDurationTable(allCourseDurations)
+      initPaginationForCourseDurations();
     } catch (err) {
-      courseDurationTable.innerHTML =
-        '<tr><td colspan="3" style="text-align:center; color:#ef4444;">Failed to load data</td></tr>';
+      console.error("Error fetching course durations:", err);
+      if (courseDurationTable) {
+        courseDurationTable.innerHTML =
+          '<tr><td colspan="3" style="text-align:center; color:#ef4444;">Failed to load data</td></tr>';
+      }
     }
   }
 
@@ -162,6 +164,7 @@ document.addEventListener("DOMContentLoaded", function () {
       showFormBtn.style.display = "inline-block";
       showListBtn.style.display = "inline-block";
     });
+
     showListBtn.addEventListener("click", function () {
       formDiv.style.display = "none";
       listDiv.style.display = "block";
@@ -172,68 +175,49 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Add course duration using common form handler
-  handleForm(courseDurationForm, async (formData) => {
-    try {
-      const courseDurationData = {
-        courseDuration: formData.get("courseDuration"),
-      };
+  if (courseDurationForm) {
+    handleForm(courseDurationForm, async (formData) => {
+      try {
+        const courseDuration = formData.get("courseDuration");
+        if (!courseDuration) {
+          alert("Please enter course duration.");
+          return;
+        }
 
-      const response = await fetch(
-        `${baseUrl}/course-duration/add-course-duration`,
-        {
+        await apiRequest(`${baseUrl}/course-duration/create-course-duration`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(courseDurationData),
-        }
-      );
+          body: JSON.stringify({ courseDuration }),
+        });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to add course duration");
+        alert("Course duration added successfully!");
+        courseDurationForm.reset();
+        formDiv.style.display = "none";
+        listDiv.style.display = "block";
+        // Show both buttons
+        showFormBtn.style.display = "inline-block";
+        showListBtn.style.display = "inline-block";
+
+        // Force refresh the data
+        await fetchCourseDurations();
+      } catch (error) {
+        console.error("Error adding course duration:", error);
+        alert("Failed to submit course duration: " + error.message);
       }
-
-      const result = await response.json();
-      console.log("Course duration added:", result);
-      alert("Course duration added successfully!");
-      courseDurationForm.reset();
-      formDiv.style.display = "none";
-      listDiv.style.display = "block";
-      // Show both buttons
-      showFormBtn.style.display = "inline-block";
-      showListBtn.style.display = "inline-block";
-
-      // Force refresh the data
-      console.log("Refreshing course durations after adding...");
-      await fetchCourseDurations();
-      console.log(
-        "Course durations refreshed, current data:",
-        allCourseDurations
-      );
-    } catch (error) {
-      console.error("Error adding course duration:", error);
-      alert("Failed to submit course duration: " + error.message);
-    }
-  });
+    });
+  }
 
   // Delete course duration using common API utility
   async function deleteCourseDuration(id) {
     try {
-      const response = await fetch(
+      await apiRequest(
         `${baseUrl}/course-duration/delete-course-duration/${id}`,
         {
           method: "DELETE",
         }
       );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.message || "Failed to delete course duration"
-        );
-      }
-
       alert("Course duration deleted successfully!");
       fetchCourseDurations();
     } catch (error) {
@@ -288,35 +272,31 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // Handle edit form submission
-  handleForm(
-    document.getElementById("editCourseDurationForm"),
-    async (formData) => {
+  const editCourseDurationForm = document.getElementById(
+    "editCourseDurationForm"
+  );
+  if (editCourseDurationForm) {
+    handleForm(editCourseDurationForm, async (formData) => {
       try {
         const id = formData.get("id");
-        const courseDurationData = {
-          courseDuration: formData.get("courseDuration"),
-        };
+        const courseDuration = formData.get("courseDuration");
 
-        const response = await fetch(
+        if (!courseDuration) {
+          alert("Please enter course duration.");
+          return;
+        }
+
+        await apiRequest(
           `${baseUrl}/course-duration/update-course-duration/${id}`,
           {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify(courseDurationData),
+            body: JSON.stringify({ courseDuration }),
           }
         );
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(
-            errorData.message || "Failed to update course duration"
-          );
-        }
-
-        const result = await response.json();
-        console.log("Course duration updated:", result);
         alert("Course duration updated successfully!");
         closeEditCourseDurationModal();
         fetchCourseDurations();
@@ -324,8 +304,8 @@ document.addEventListener("DOMContentLoaded", function () {
         console.error("Error updating course duration:", error);
         alert("Failed to update course duration: " + error.message);
       }
-    }
-  );
+    });
+  }
 
   // Initial fetch
   fetchCourseDurations();

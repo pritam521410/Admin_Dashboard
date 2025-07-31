@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
   const baseUrl = window.baseUrl || "http://localhost:4000/api";
-  if (typeof initSidebar === "function") initSidebar();
 
   const rankingForm = document.getElementById("rankingForm");
   const formDiv = document.getElementById("formDiv");

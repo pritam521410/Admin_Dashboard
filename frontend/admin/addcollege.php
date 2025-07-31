@@ -192,6 +192,7 @@
 </div>
 
 <!-- JS Scripts -->
+<script src="../js/sidebar.js"></script>
 <script src="../js/common.js"></script>
 <script src="../js/addcollege.js"></script>
 </body>

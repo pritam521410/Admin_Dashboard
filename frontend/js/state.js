@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
   const baseUrl = window.baseUrl || "http://localhost:4000/api";
-  if (typeof initSidebar === "function") initSidebar();
 
   const stateForm = document.getElementById("stateForm");
   const formDiv = document.getElementById("formDiv");

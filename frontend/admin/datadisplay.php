@@ -38,6 +38,7 @@
       </div>
     </div>
   </div>
+  <script src="../js/sidebar.js"></script>
   <script src="../js/common.js"></script>
   <script src="../js/datadisplay.js"></script>
 </body>

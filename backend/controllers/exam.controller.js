@@ -18,7 +18,6 @@ export const addExam = async (req, res) => {
       examDate,
       resultDate,
       examLevel,
-      examType,
       state,
     } = req.body;
     const logoFile = req.files?.logo?.[0];
@@ -45,7 +44,6 @@ export const addExam = async (req, res) => {
       examDate,
       resultDate,
       examLevel,
-      examType,
       state,
       logo: logoFile ? `uploads/${logoFile.filename}` : undefined,
       pdf: pdfFile ? `uploads/${pdfFile.filename}` : undefined,
@@ -64,7 +62,6 @@ export const getAllExams = async (req, res) => {
       .populate("stream", "name")
       .populate("course", "name")
       .populate("examLevel", "name")
-      .populate("examType", "examTypeName")
       .populate("state", "name")
       .sort({ createdAt: -1 });
     res.status(200).json(exams);

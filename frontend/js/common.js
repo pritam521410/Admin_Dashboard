@@ -47,66 +47,6 @@ function handleForm(form, onSubmit) {
   };
 }
 
-// --- Sidebar/Menu Utility ---
-function initSidebar() {
-  document.querySelectorAll(".sidebar .submenu").forEach(function (submenu) {
-    submenu.classList.remove("open");
-  });
-  document.querySelectorAll(".submenu li a").forEach(function (link) {
-    link.classList.remove("active");
-    link.blur();
-    link.style.background = "";
-    link.style.color = "";
-  });
-  document
-    .querySelectorAll(".sidebar .fa-chevron-down")
-    .forEach(function (chevron) {
-      chevron.style.transform = "rotate(0deg)";
-      chevron.style.transition = "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
-    });
-  // Add more sidebar logic as needed...
-}
-
-// --- Sidebar Submenu Toggle (Event Delegation) ---
-document.addEventListener("DOMContentLoaded", function () {
-  // Ensure all submenus are closed on load
-  document.querySelectorAll(".sidebar .submenu").forEach(function (submenu) {
-    submenu.classList.remove("open");
-  });
-  // Remove previous individual listeners (if any)
-  const sidebarNav = document.querySelector(".sidebar nav");
-  if (sidebarNav) {
-    sidebarNav.addEventListener("click", function (e) {
-      const btn = e.target.closest(".menu-btn");
-      if (!btn) return;
-      const parent = btn.closest(".menu-item.has-submenu");
-      if (!parent) return;
-      const submenu = parent.querySelector(".submenu");
-      const chevron = btn.querySelector(".submenu-chevron");
-      const isOpen = submenu.classList.contains("open");
-      console.log("Toggling submenu:", submenu, "Currently open:", isOpen);
-      // Close all other submenus
-      document
-        .querySelectorAll(".sidebar .submenu.open")
-        .forEach(function (openSub) {
-          if (openSub !== submenu) openSub.classList.remove("open");
-        });
-      document
-        .querySelectorAll(".sidebar .submenu-chevron")
-        .forEach(function (chev) {
-          if (chev !== chevron) chev.style.transform = "rotate(0deg)";
-        });
-      // Toggle this submenu
-      submenu.classList.toggle("open");
-      if (submenu.classList.contains("open")) {
-        if (chevron) chevron.style.transform = "rotate(180deg)";
-      } else {
-        if (chevron) chevron.style.transform = "rotate(0deg)";
-      }
-    });
-  }
-});
-
 // --- Image Preview Utility ---
 function previewImage(inputId, previewId) {
   const input = document.getElementById(inputId);
@@ -133,5 +73,4 @@ function previewImage(inputId, previewId) {
 window.apiRequest = apiRequest;
 window.renderTable = renderTable;
 window.handleForm = handleForm;
-window.initSidebar = initSidebar;
 window.previewImage = previewImage;

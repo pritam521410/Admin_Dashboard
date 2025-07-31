@@ -4,7 +4,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const baseUrl = window.baseUrl;
 
   // Sidebar/menu logic
-  if (typeof initSidebar === "function") initSidebar();
 
   // Country form/list functionality
   const showFormBtn = document.getElementById("showFormBtn");
@@ -161,34 +160,6 @@ document.addEventListener("DOMContentLoaded", function () {
     } catch (error) {
       alert("Failed to delete country.");
     }
-  }
-
-  // Auto-open Location Directory submenu on country page
-  const locationDropdown = document.getElementById("locationDirectoryDropdown");
-  const locationChevron = document.getElementById("locationChevron");
-  if (locationDropdown && !locationDropdown.classList.contains("open")) {
-    locationDropdown.classList.add("open");
-    if (locationChevron) {
-      locationChevron.style.transform = "rotate(180deg)";
-    }
-  }
-
-  // Highlight the Country link in the sidebar as active
-  const countrySidebarLink = document.querySelector('a[href="country.php"]');
-  if (countrySidebarLink) {
-    countrySidebarLink.classList.add("active");
-    countrySidebarLink.style.background = "#2563eb";
-    countrySidebarLink.style.color = "#fff";
-    // Remove active from siblings
-    const submenuLinks =
-      countrySidebarLink.parentElement.parentElement.querySelectorAll("a");
-    submenuLinks.forEach((link) => {
-      if (link !== countrySidebarLink) {
-        link.classList.remove("active");
-        link.style.background = "";
-        link.style.color = "";
-      }
-    });
   }
 
   fetchCountries();

@@ -93,12 +93,6 @@ $pageFor = isset($_GET['type']) && $_GET['type'] == 'list' ? 'list' : 'add';
           </div>
           <div class="form-row">
             <div class="form-group" style="min-width: 200px;">
-              <label>Exam Type :</label>
-              <select name="examType">
-                <option value="">-- Select --</option>
-              </select>
-            </div>
-            <div class="form-group" style="min-width: 200px;">
               <label>State * :</label>
               <select name="state" required>
                 <option value="">-- Select --</option>
@@ -182,6 +176,7 @@ $pageFor = isset($_GET['type']) && $_GET['type'] == 'list' ? 'list' : 'add';
       </div>
       <?php include '../components/footer.php'; ?>
     </div>
+    <script src="../js/sidebar.js"></script>
     <script src="../js/script.js"></script>
     <script src="../js/dashboard.js"></script>
     <script src="../js/common.js"></script>

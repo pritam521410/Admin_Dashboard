@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
   const baseUrl = window.baseUrl || "http://localhost:4000/api";
-  if (typeof initSidebar === "function") initSidebar();
 
   const addExamForm = document.getElementById("addExamForm");
   const formDiv = document.getElementById("examFormDiv");
@@ -14,7 +13,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const courseDropdown = document.querySelector('select[name="course"]');
   const examNameDropdown = document.querySelector('select[name="examName"]');
   const examLevelDropdown = document.querySelector('select[name="examLevel"]');
-  const examTypeDropdown = document.querySelector('select[name="examType"]');
   const stateDropdown = document.querySelector('select[name="state"]');
 
   // Populate stream dropdown
@@ -87,29 +85,6 @@ document.addEventListener("DOMContentLoaded", function () {
       console.error("Error loading exam levels:", err);
       dropdown.innerHTML =
         '<option value="">Failed to load exam levels</option>';
-    }
-  }
-
-  // Populate exam type dropdown
-  async function populateExamTypeDropdown(dropdown, selectedId) {
-    try {
-      const examTypes = await apiRequest(`${baseUrl}/exam-type/all-exam-type`);
-      dropdown.innerHTML = '<option value="">-- Select Exam Type --</option>';
-      examTypes.forEach((type) => {
-        const option = document.createElement("option");
-        option.value = type._id;
-        option.textContent =
-          type.examTypeName?.fullName ||
-          type.examTypeName?.shortName ||
-          type.name ||
-          "Unknown";
-        if (selectedId && type._id === selectedId) option.selected = true;
-        dropdown.appendChild(option);
-      });
-    } catch (err) {
-      console.error("Error loading exam types:", err);
-      dropdown.innerHTML =
-        '<option value="">Failed to load exam types</option>';
     }
   }
 
@@ -494,7 +469,6 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("Course dropdown element:", courseDropdown);
     console.log("Exam name dropdown element:", examNameDropdown);
     console.log("Exam level dropdown element:", examLevelDropdown);
-    console.log("Exam type dropdown element:", examTypeDropdown);
     console.log("State dropdown element:", stateDropdown);
 
     try {
@@ -513,10 +487,6 @@ document.addEventListener("DOMContentLoaded", function () {
       if (examLevelDropdown) {
         console.log("Populating exam level dropdown...");
         await populateExamLevelDropdown(examLevelDropdown);
-      }
-      if (examTypeDropdown) {
-        console.log("Populating exam type dropdown...");
-        await populateExamTypeDropdown(examTypeDropdown);
       }
       if (stateDropdown) {
         console.log("Populating state dropdown...");

@@ -61,8 +61,6 @@
           </table>
         </div>
       </div>
-    </div>
-  </div>
 
       <!-- Edit Course Duration Modal -->
       <div id="editCourseDurationModal" class="modal">
@@ -82,7 +80,10 @@
           </form>
         </div>
       </div>
-
+      <?php include '../components/footer.php'; ?>
+    </div>
+  </div>
+  <script src="../js/sidebar.js"></script>
   <script src="../js/script.js"></script>
   <script src="../js/dashboard.js"></script>
   <script src="../js/common.js"></script>
